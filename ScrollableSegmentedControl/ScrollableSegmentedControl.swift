@@ -120,6 +120,9 @@ public class ScrollableSegmentedControl: UIControl {
         }
     }
     
+    /**
+     Configure if the selected segment should have underline. Default value is false.
+    */
     public var underlineSelected:Bool = false
     
     // MARK: - Layout management
