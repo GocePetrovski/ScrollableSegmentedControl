@@ -72,7 +72,7 @@ public class ScrollableSegmentedControl: UIControl {
      */
     public func insertSegment(with image: UIImage, at index: Int) {
         let segment = SegmentData()
-        segment.image = image
+        segment.image = image.withRenderingMode(.alwaysTemplate)
         segmentsData.insert(segment, at: index)
     }
     
@@ -83,7 +83,7 @@ public class ScrollableSegmentedControl: UIControl {
     public func insertSegment(withTitle title: String?, image: UIImage?, at index: Int) {
         let segment = SegmentData()
         segment.title = title
-        segment.image = image
+        segment.image = image?.withRenderingMode(.alwaysTemplate)
         segmentsData.insert(segment, at: index)
     }
     
@@ -169,6 +169,7 @@ public class ScrollableSegmentedControl: UIControl {
     }
     
     private func configureSegmentSize() {
+        // FIXME: this needs to be calculated
         let width:CGFloat = 120
         
         let itemSize = CGSize(width: width, height:frame.size.height)
@@ -253,6 +254,8 @@ public class ScrollableSegmentedControl: UIControl {
     
     private class BaseSegmentCollectionViewCell: UICollectionViewCell {
         static let textPadding:CGFloat = 2.0
+        static let defaultFont = UIFont.systemFont(ofSize: 14)
+        static let defaultTextColor = UIColor.darkGray
         
         var underlineView:UIView?
         
@@ -298,13 +301,13 @@ public class ScrollableSegmentedControl: UIControl {
             }
         }
         
-        private override var isHighlighted: Bool {
+        override var isHighlighted: Bool {
             didSet {
                 underlineView?.isHidden = !isHighlighted
             }
         }
         
-        private override var isSelected: Bool {
+        override var isSelected: Bool {
             didSet {
                 underlineView?.isHidden = !isSelected
             }
@@ -314,16 +317,16 @@ public class ScrollableSegmentedControl: UIControl {
     private class TextOnlySegmentCollectionViewCell: BaseSegmentCollectionViewCell {
         let titleLabel = UILabel()
         
-        private override var isHighlighted: Bool {
+        override var isHighlighted: Bool {
             didSet {
                 titleLabel.textColor = (isHighlighted == true) ? UIColor.black : UIColor.darkGray
             }
         }
         
-        private override var isSelected: Bool {
+        override var isSelected: Bool {
             didSet {
                 titleLabel.textColor = (isSelected == true) ? UIColor.black : UIColor.darkGray
-                titleLabel.font = (isSelected == true) ? UIFont.boldSystemFont(ofSize: 14) : UIFont.systemFont(ofSize: 14)
+                //titleLabel.font = (isSelected == true) ? UIFont.boldSystemFont(ofSize: 14) : UIFont.systemFont(ofSize: 14)
             }
         }
         
@@ -332,8 +335,8 @@ public class ScrollableSegmentedControl: UIControl {
             
             contentView.addSubview(titleLabel)
             titleLabel.translatesAutoresizingMaskIntoConstraints = false
-            titleLabel.textColor = UIColor.darkGray
-            titleLabel.font = UIFont.systemFont(ofSize: 14)
+            titleLabel.textColor = BaseSegmentCollectionViewCell.defaultTextColor
+            titleLabel.font = BaseSegmentCollectionViewCell.defaultFont
             
             titleLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
             titleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor).isActive = true
@@ -350,6 +353,7 @@ public class ScrollableSegmentedControl: UIControl {
             
             contentView.addSubview(imageView)
             imageView.translatesAutoresizingMaskIntoConstraints = false
+            imageView.tintColor = BaseSegmentCollectionViewCell.defaultTextColor
             
             imageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
             imageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor).isActive = true
@@ -367,6 +371,9 @@ public class ScrollableSegmentedControl: UIControl {
             super.configure()
             containerView = UIStackView(arrangedSubviews: [imageView, titleLabel])
             contentView.addSubview(containerView)
+            titleLabel.textColor = BaseSegmentCollectionViewCell.defaultTextColor
+            titleLabel.font = BaseSegmentCollectionViewCell.defaultFont
+            imageView.tintColor = BaseSegmentCollectionViewCell.defaultTextColor
             
             containerView.axis = .vertical
             containerView.alignment = .center
