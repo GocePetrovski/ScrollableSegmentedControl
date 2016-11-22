@@ -21,6 +21,7 @@ public class ScrollableSegmentedControl: UIControl {
     private var collectionView:UICollectionView?
     private var collectionViewController:CollectionViewController?
     private var segmentsData = [SegmentData]()
+    private var longestTextWidth:CGFloat = 10
     
     public var segmentStyle:ScrollableSegmentedControlSegmentStyle = .textOnly {
         didSet {
@@ -34,6 +35,7 @@ public class ScrollableSegmentedControl: UIControl {
                     collectionView?.register(ImageAndTextSegmentCollectionViewCell.self, forCellWithReuseIdentifier: CollectionViewController.imagAndTextCellIdentifier)
                 }
                 
+                setNeedsLayout()
                 flowLayout.invalidateLayout()
                 collectionView?.reloadData()
             }
@@ -65,6 +67,7 @@ public class ScrollableSegmentedControl: UIControl {
         let segment = SegmentData()
         segment.title = title
         segmentsData.insert(segment, at: index)
+        calculateLongestTextWidth(text: title)
     }
     
     /**
@@ -85,6 +88,10 @@ public class ScrollableSegmentedControl: UIControl {
         segment.title = title
         segment.image = image?.withRenderingMode(.alwaysTemplate)
         segmentsData.insert(segment, at: index)
+        
+        if let str = title {
+            calculateLongestTextWidth(text: str)
+        }
     }
     
     /**
@@ -123,6 +130,7 @@ public class ScrollableSegmentedControl: UIControl {
     /**
      Configure if the selected segment should have underline. Default value is false.
     */
+    @IBInspectable
     public var underlineSelected:Bool = false
     
     // MARK: - Layout management
@@ -169,11 +177,32 @@ public class ScrollableSegmentedControl: UIControl {
     }
     
     private func configureSegmentSize() {
-        // FIXME: this needs to be calculated
-        let width:CGFloat = 120
+        let width:CGFloat
         
-        let itemSize = CGSize(width: width, height:frame.size.height)
+        switch segmentStyle {
+        case .imageOnLeft:
+            width = longestTextWidth + BaseSegmentCollectionViewCell.imageSize + BaseSegmentCollectionViewCell.imageToTextMargin * 2
+        default:
+            if collectionView!.frame.size.width > longestTextWidth * CGFloat(segmentsData.count) {
+                width = collectionView!.frame.size.width / CGFloat(segmentsData.count)
+            } else {
+                width = longestTextWidth
+            }
+        }
+        
+        
+        let itemSize = CGSize(width: width, height: frame.size.height)
         flowLayout.itemSize = itemSize
+    }
+    
+    private func calculateLongestTextWidth(text:String) {
+        let fontAttributes = [NSFontAttributeName: BaseSegmentCollectionViewCell.defaultFont]
+        let size = (text as NSString).size(attributes: fontAttributes)
+        let newLongestTextWidth = size.width + BaseSegmentCollectionViewCell.textPadding * 2
+        if newLongestTextWidth > longestTextWidth {
+            longestTextWidth = newLongestTextWidth
+            configureSegmentSize()
+        }
     }
   
     /*
@@ -253,7 +282,9 @@ public class ScrollableSegmentedControl: UIControl {
     // MARK: - SegmentCollectionViewCell
     
     private class BaseSegmentCollectionViewCell: UICollectionViewCell {
-        static let textPadding:CGFloat = 2.0
+        static let textPadding:CGFloat = 8.0
+        static let imageToTextMargin:CGFloat = 14.0
+        static let imageSize:CGFloat = 14.0
         static let defaultFont = UIFont.systemFont(ofSize: 14)
         static let defaultTextColor = UIColor.darkGray
         
