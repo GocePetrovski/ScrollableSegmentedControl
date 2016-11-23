@@ -88,9 +88,28 @@ public class ScrollableSegmentedControl: UIControl {
     }
     
     /**
+     Removes segment at a specific position from the receiver.
+     */
+   func removeSegment(at segment: Int){
+        segmentsData.remove(at: segment)
+    }
+    
+    /**
      Returns the number of segments the receiver has.
      */
     public var numberOfSegments: Int { return segmentsData.count }
+    
+    /**
+     Returns the title of the specified segment.
+     */
+    func titleForSegment(at segment: Int) -> String? {
+        if segmentsData.count == 0 {
+            return nil
+        }
+        
+        return safeSegmentData(forIndex: segment).title
+    }
+    
     
     /**
      The index number identifying the selected segment (that is, the last segment touched).
@@ -174,6 +193,20 @@ public class ScrollableSegmentedControl: UIControl {
         
         let itemSize = CGSize(width: width, height:frame.size.height)
         flowLayout.itemSize = itemSize
+    }
+    
+    private func safeSegmentData(forIndex index:Int) -> SegmentData {
+        let segmentData:SegmentData
+        
+        if index <= 0 {
+            segmentData = segmentsData[0]
+        } else if index >= segmentsData.count {
+            segmentData = segmentsData[segmentsData.count - 1]
+        } else {
+            segmentData = segmentsData[index]
+        }
+        
+        return segmentData
     }
   
     /*
