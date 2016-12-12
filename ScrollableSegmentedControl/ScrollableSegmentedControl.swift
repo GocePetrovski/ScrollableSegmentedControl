@@ -31,8 +31,10 @@ public class ScrollableSegmentedControl: UIControl {
                     collectionView?.register(TextOnlySegmentCollectionViewCell.self, forCellWithReuseIdentifier: CollectionViewController.textOnlyCellIdentifier)
                 case .imageOnly:
                     collectionView?.register(ImageOnlySegmentCollectionViewCell.self, forCellWithReuseIdentifier: CollectionViewController.imageOnlyCellIdentifier)
-                default:
-                    collectionView?.register(ImageAndTextSegmentCollectionViewCell.self, forCellWithReuseIdentifier: CollectionViewController.imagAndTextCellIdentifier)
+                case .imageOnTop:
+                    collectionView?.register(ImageOnTopSegmentCollectionViewCell.self, forCellWithReuseIdentifier: CollectionViewController.imageOnTopCellIdentifier)
+                case .imageOnLeft:
+                    collectionView?.register(ImageOnLeftSegmentCollectionViewCell.self, forCellWithReuseIdentifier: CollectionViewController.imageOnLeftCellIdentifier)
                 }
                 
                 setNeedsLayout()
@@ -257,7 +259,8 @@ public class ScrollableSegmentedControl: UIControl {
     private class CollectionViewController : NSObject, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout{
         static let textOnlyCellIdentifier = "textOnlyCellIdentifier"
         static let imageOnlyCellIdentifier = "imageOnlyCellIdentifier"
-        static let imagAndTextCellIdentifier = "imagAndTextCellIdentifier"
+        static let imageOnTopCellIdentifier = "imageOnTopCellIdentifier"
+        static let imageOnLeftCellIdentifier = "imageOnLeftCellIdentifier"
         
         private weak var segmentedControl: ScrollableSegmentedControl!
         
@@ -289,12 +292,16 @@ public class ScrollableSegmentedControl: UIControl {
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CollectionViewController.imageOnlyCellIdentifier, for: indexPath) as! ImageOnlySegmentCollectionViewCell
                 cell.imageView.image = data.image
                 segmentCell = cell
-            default:
-                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CollectionViewController.imagAndTextCellIdentifier, for: indexPath) as! ImageAndTextSegmentCollectionViewCell
+            case .imageOnTop:
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CollectionViewController.imageOnTopCellIdentifier, for: indexPath) as! ImageOnTopSegmentCollectionViewCell
                 cell.titleLabel.text = data.title
                 cell.imageView.image = data.image
                 
-                cell.containerView.axis = (segmentedControl.segmentStyle == .imageOnTop) ? .vertical : .horizontal
+                segmentCell = cell
+            case .imageOnLeft:
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CollectionViewController.imageOnLeftCellIdentifier, for: indexPath) as! ImageOnLeftSegmentCollectionViewCell
+                cell.titleLabel.text = data.title
+                cell.imageView.image = data.image
                 
                 segmentCell = cell
             }
@@ -426,32 +433,57 @@ public class ScrollableSegmentedControl: UIControl {
         }
     }
     
-    private class ImageAndTextSegmentCollectionViewCell: BaseSegmentCollectionViewCell {
+    private class ImageOnTopSegmentCollectionViewCell: BaseSegmentCollectionViewCell {
         let titleLabel = UILabel()
         let imageView = UIImageView()
-        var containerView:UIStackView! = nil
         
         override func configure(){
             super.configure()
-            containerView = UIStackView(arrangedSubviews: [imageView, titleLabel])
-            contentView.addSubview(containerView)
             titleLabel.textColor = BaseSegmentCollectionViewCell.defaultTextColor
             titleLabel.font = BaseSegmentCollectionViewCell.defaultFont
             imageView.tintColor = BaseSegmentCollectionViewCell.defaultTextColor
+            imageView.contentMode = .scaleAspectFit
+            imageView.clipsToBounds = true
             
-            containerView.axis = .vertical
-            containerView.alignment = .center
-            containerView.distribution = .equalCentering
-            containerView.spacing = BaseSegmentCollectionViewCell.textPadding
+            titleLabel.translatesAutoresizingMaskIntoConstraints = false
+            imageView.translatesAutoresizingMaskIntoConstraints = false
             
-            containerView.addSubview(titleLabel)
-            containerView.addSubview(imageView)
+            contentView.addSubview(titleLabel)
+            contentView.addSubview(imageView)
             
+            imageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
+            titleLabel.centerXAnchor.constraint(equalTo: imageView.centerXAnchor).isActive = true
+            titleLabel.lastBaselineAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -BaseSegmentCollectionViewCell.textPadding).isActive = true
+            imageView.bottomAnchor.constraint(equalTo: titleLabel.topAnchor, constant: -BaseSegmentCollectionViewCell.textPadding).isActive = true
+            imageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: BaseSegmentCollectionViewCell.textPadding).isActive = true
+        }
+    }
+    
+    private class ImageOnLeftSegmentCollectionViewCell: BaseSegmentCollectionViewCell {
+        let titleLabel = UILabel()
+        let imageView = UIImageView()
+        
+        override func configure(){
+            super.configure()
+            titleLabel.textColor = BaseSegmentCollectionViewCell.defaultTextColor
+            titleLabel.font = BaseSegmentCollectionViewCell.defaultFont
+            imageView.tintColor = BaseSegmentCollectionViewCell.defaultTextColor
+            imageView.contentMode = .scaleAspectFit
+            imageView.clipsToBounds = true
             
-            containerView.translatesAutoresizingMaskIntoConstraints = false
+            contentView.addSubview(titleLabel)
+            contentView.addSubview(imageView)
             
-            containerView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
-            containerView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor).isActive = true
+            titleLabel.translatesAutoresizingMaskIntoConstraints = false
+            imageView.translatesAutoresizingMaskIntoConstraints = false
+            
+            imageView.heightAnchor.constraint(equalToConstant: BaseSegmentCollectionViewCell.imageSize).isActive = true
+            imageView.widthAnchor.constraint(equalToConstant: BaseSegmentCollectionViewCell.imageSize).isActive = true
+            imageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor).isActive = true
+            imageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: BaseSegmentCollectionViewCell.textPadding).isActive = true
+            titleLabel.centerYAnchor.constraint(equalTo: imageView.centerYAnchor).isActive = true
+            titleLabel.leadingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: BaseSegmentCollectionViewCell.textPadding).isActive = true
+            contentView.trailingAnchor.constraint(greaterThanOrEqualTo: titleLabel.trailingAnchor, constant: BaseSegmentCollectionViewCell.textPadding).isActive = true
         }
     }
 }
