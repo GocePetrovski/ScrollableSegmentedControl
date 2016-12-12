@@ -27,6 +27,12 @@ class TableViewController: UITableViewController {
         segmentedControl.insertSegment(withTitle: "Segment 6", image: #imageLiteral(resourceName: "segment-6"), at: 5)
         
         segmentedControl.underlineSelected = true
+        
+        segmentedControl.addTarget(self, action: #selector(TableViewController.segmentSelected(sender:)), for: .valueChanged)
+    }
+    
+    func segmentSelected(sender:ScrollableSegmentedControl) {
+        print("Segment at index \(sender.selectedSegmentIndex)  selected")
     }
 
     override func didReceiveMemoryWarning() {

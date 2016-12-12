@@ -358,7 +358,6 @@ public class ScrollableSegmentedControl: UIControl {
         }
         
         func configure() {
-            contentView.backgroundColor = UIColor.white
             configureConstraints()
         }
         
@@ -403,7 +402,6 @@ public class ScrollableSegmentedControl: UIControl {
         
         override func configure(){
             super.configure()
-            
             contentView.addSubview(titleLabel)
             titleLabel.translatesAutoresizingMaskIntoConstraints = false
             titleLabel.textColor = BaseSegmentCollectionViewCell.defaultTextColor

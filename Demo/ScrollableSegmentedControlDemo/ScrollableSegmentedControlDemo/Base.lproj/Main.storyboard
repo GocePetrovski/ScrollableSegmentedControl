@@ -19,7 +19,7 @@
                         <view key="tableHeaderView" contentMode="scaleToFill" id="sFi-9r-jXX" customClass="ScrollableSegmentedControl" customModule="ScrollableSegmentedControl">
                             <rect key="frame" x="0.0" y="64" width="375" height="49"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <color key="backgroundColor" red="0.90196079019999997" green="0.90196079019999997" blue="0.90196079019999997" alpha="1" colorSpace="calibratedRGB"/>
                         </view>
                         <sections>
                             <tableViewSection id="2bw-rH-tVL">
