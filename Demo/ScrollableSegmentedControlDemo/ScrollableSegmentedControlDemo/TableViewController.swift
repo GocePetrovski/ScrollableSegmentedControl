@@ -44,18 +44,29 @@ class TableViewController: UITableViewController {
             cell.accessoryType = .checkmark
         }
         
+        var height = 44
         switch indexPath.row {
         case 0:
             segmentedControl.segmentStyle = .textOnly
         case 1:
             segmentedControl.segmentStyle = .imageOnly
+            height = 52
         case 2:
             segmentedControl.segmentStyle = .imageOnTop
+            height = 60
         case 3:
             segmentedControl.segmentStyle = .imageOnLeft
         default: break
             
         }
+        
+        let headerView = tableView.tableHeaderView!
+        tableView.tableHeaderView = nil
+        var headerFrame = headerView.frame
+ 
+        headerFrame.size.height =  CGFloat(height)
+        headerView.frame = headerFrame
+        tableView.tableHeaderView = headerView
         
         tableView.deselectRow(at: indexPath, animated: true)
     }

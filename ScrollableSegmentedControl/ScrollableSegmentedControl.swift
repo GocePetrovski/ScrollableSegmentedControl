@@ -453,7 +453,7 @@ public class ScrollableSegmentedControl: UIControl {
             
             imageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
             titleLabel.centerXAnchor.constraint(equalTo: imageView.centerXAnchor).isActive = true
-            titleLabel.lastBaselineAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -BaseSegmentCollectionViewCell.textPadding).isActive = true
+            titleLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -BaseSegmentCollectionViewCell.textPadding).isActive = true
             imageView.bottomAnchor.constraint(equalTo: titleLabel.topAnchor, constant: -BaseSegmentCollectionViewCell.textPadding).isActive = true
             imageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: BaseSegmentCollectionViewCell.textPadding).isActive = true
         }
