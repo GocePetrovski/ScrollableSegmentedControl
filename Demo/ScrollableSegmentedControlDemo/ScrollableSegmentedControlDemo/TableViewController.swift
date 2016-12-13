@@ -12,6 +12,7 @@ import ScrollableSegmentedControl
 class TableViewController: UITableViewController {
 
     @IBOutlet weak var segmentedControl: ScrollableSegmentedControl!
+    @IBOutlet weak var removeSegmentButton: UIBarButtonItem!
     
     var selectedIndexPath = IndexPath(row: 0, section: 0)
     
@@ -35,13 +36,25 @@ class TableViewController: UITableViewController {
         print("Segment at index \(sender.selectedSegmentIndex)  selected")
     }
 
+    @IBAction func addSegment(_ sender: Any) {
+        let index = segmentedControl.numberOfSegments
+        segmentedControl.insertSegment(withTitle: "Segment \(index + 1)", image: #imageLiteral(resourceName: "segment-6"), at: index)
+    }
+    
+    @IBAction func removeSegment(_ sender: Any) {
+        if segmentedControl.numberOfSegments > 6 {
+            segmentedControl.removeSegment(at: segmentedControl.numberOfSegments - 1)
+        }
+    }
+    
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-
+    
         if let cell = tableView.cellForRow(at: selectedIndexPath) {
             cell.accessoryType = .none
         }

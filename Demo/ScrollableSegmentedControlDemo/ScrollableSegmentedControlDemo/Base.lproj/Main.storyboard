@@ -100,8 +100,20 @@
                             <outlet property="delegate" destination="Ulk-MU-gVx" id="8I8-7n-6NU"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" id="Mcy-UD-q0l"/>
+                    <navigationItem key="navigationItem" id="Mcy-UD-q0l">
+                        <barButtonItem key="leftBarButtonItem" title="Remove" id="54e-a0-xTl">
+                            <connections>
+                                <action selector="removeSegment:" destination="Ulk-MU-gVx" id="bdv-G3-Orz"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" title="Add" id="Xzs-oN-533">
+                            <connections>
+                                <action selector="addSegment:" destination="Ulk-MU-gVx" id="dxL-h8-32H"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
+                        <outlet property="removeSegmentButton" destination="54e-a0-xTl" id="DVA-cP-rVv"/>
                         <outlet property="segmentedControl" destination="sFi-9r-jXX" id="fVV-RQ-kFx"/>
                     </connections>
                 </tableViewController>

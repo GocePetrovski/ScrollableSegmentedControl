@@ -70,6 +70,7 @@ public class ScrollableSegmentedControl: UIControl {
         segment.title = title
         segmentsData.insert(segment, at: index)
         calculateLongestTextWidth(text: title)
+        collectionView?.reloadData()
     }
     
     /**
@@ -79,6 +80,7 @@ public class ScrollableSegmentedControl: UIControl {
         let segment = SegmentData()
         segment.image = image.withRenderingMode(.alwaysTemplate)
         segmentsData.insert(segment, at: index)
+        collectionView?.reloadData()
     }
     
     
@@ -94,13 +96,15 @@ public class ScrollableSegmentedControl: UIControl {
         if let str = title {
             calculateLongestTextWidth(text: str)
         }
+        collectionView?.reloadData()
     }
     
     /**
      Removes segment at a specific position from the receiver.
      */
-   func removeSegment(at segment: Int){
+    public func removeSegment(at segment: Int){
         segmentsData.remove(at: segment)
+        collectionView?.reloadData()
     }
     
     /**
