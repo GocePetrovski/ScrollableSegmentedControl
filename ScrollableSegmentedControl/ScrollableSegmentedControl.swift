@@ -44,7 +44,9 @@ public class ScrollableSegmentedControl: UIControl {
                 collectionView?.reloadData()
                 
                 if indexPath != nil {
-                    collectionView?.selectItem(at: indexPath, animated: true, scrollPosition: UICollectionViewScrollPosition.left)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.05, execute: {
+                       self.collectionView?.selectItem(at: indexPath, animated: true, scrollPosition: UICollectionViewScrollPosition.left)
+                    })
                 }
                 
             }
