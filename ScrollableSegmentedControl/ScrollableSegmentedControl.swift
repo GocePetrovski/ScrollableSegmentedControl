@@ -37,9 +37,16 @@ public class ScrollableSegmentedControl: UIControl {
                     collectionView?.register(ImageOnLeftSegmentCollectionViewCell.self, forCellWithReuseIdentifier: CollectionViewController.imageOnLeftCellIdentifier)
                 }
                 
+                let indexPath = collectionView?.indexPathsForSelectedItems?.last
+                
                 setNeedsLayout()
                 flowLayout.invalidateLayout()
                 collectionView?.reloadData()
+                
+                if indexPath != nil {
+                    collectionView?.selectItem(at: indexPath, animated: true, scrollPosition: UICollectionViewScrollPosition.left)
+                }
+                
             }
         }
     }
@@ -223,7 +230,7 @@ public class ScrollableSegmentedControl: UIControl {
     private func calculateLongestTextWidth(text:String) {
         let fontAttributes = [NSFontAttributeName: BaseSegmentCollectionViewCell.defaultFont]
         let size = (text as NSString).size(attributes: fontAttributes)
-        let newLongestTextWidth = size.width + BaseSegmentCollectionViewCell.textPadding * 2
+        let newLongestTextWidth = 2.0 + size.width + BaseSegmentCollectionViewCell.textPadding * 2
         if newLongestTextWidth > longestTextWidth {
             longestTextWidth = newLongestTextWidth
             configureSegmentSize()
