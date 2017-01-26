@@ -1,5 +1,10 @@
 # ScrollableSegmentedControl
 
+[![CI Status](https://travis-ci.org/GocePetrovski/ScrollableSegmentedControl.svg?branch=master)](https://travis-ci.org/GocePetrovski/ScrollableSegmentedControl)
+[![Version](https://img.shields.io/cocoapods/v/ScrollableSegmentedControl.svg?style=flat)](http://cocoadocs.org/docsets/ScrollableSegmentedControl)
+[![License](https://img.shields.io/cocoapods/l/ScrollableSegmentedControl.svg?style=flat)](http://cocoadocs.org/docsets/ScrollableSegmentedControl)
+[![Platform](https://img.shields.io/cocoapods/p/ScrollableSegmentedControl.svg?style=flat)](http://cocoadocs.org/docsets/ScrollableSegmentedControl)
+
 ScrollableSegmentedControl is replacement for UISegmentedControl that becomes scrollable when the total width of all segments exceeds the width of the control itself. 
 
 ScrollableSegmentedControl supports 4 styles of segments: text only, image only, text with image on top and text with image on left. 
