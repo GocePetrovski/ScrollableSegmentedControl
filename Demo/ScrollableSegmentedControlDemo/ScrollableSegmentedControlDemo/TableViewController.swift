@@ -28,6 +28,7 @@ class TableViewController: UITableViewController {
         segmentedControl.insertSegment(withTitle: "Segment 6", image: #imageLiteral(resourceName: "segment-6"), at: 5)
         
         segmentedControl.underlineSelected = true
+        segmentedControl.selectedSegmentIndex = 0
         
         segmentedControl.addTarget(self, action: #selector(TableViewController.segmentSelected(sender:)), for: .valueChanged)
     }

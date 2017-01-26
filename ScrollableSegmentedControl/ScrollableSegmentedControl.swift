@@ -350,8 +350,8 @@ public class ScrollableSegmentedControl: UIControl {
                         underlineView?.removeFromSuperview()
                     } else {
                         underlineView = UIView()
-                        underlineView?.backgroundColor = tintColor
-                        underlineView?.isHidden = true
+                        underlineView!.backgroundColor = tintColor
+                        underlineView!.isHidden = !isSelected
                         contentView.insertSubview(underlineView!, at: contentView.subviews.count)
                     }
                     
