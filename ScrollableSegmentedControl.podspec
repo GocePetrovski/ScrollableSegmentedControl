@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name = 'ScrollableSegmentedControl'
-  s.version = '1.0.1'
+  s.version = '1.0.2'
   s.license = 'MIT'
   s.summary = 'Scrollable Segmented Control for when UISegmentedControl is not sufficient'
   s.homepage = 'https://github.com/GocePetrovski/ScrollableSegmentedControl'
