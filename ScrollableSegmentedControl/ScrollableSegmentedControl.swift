@@ -200,6 +200,7 @@ public class ScrollableSegmentedControl: UIControl {
         flowLayout.minimumLineSpacing = 0
         
         collectionView = UICollectionView(frame: frame, collectionViewLayout: flowLayout)
+        collectionView!.tag = 1
         collectionView!.tintColor = tintColor
         collectionView!.register(TextOnlySegmentCollectionViewCell.self, forCellWithReuseIdentifier: CollectionViewController.textOnlyCellIdentifier)
         collectionViewController = CollectionViewController(segmentedControl: self)
@@ -320,6 +321,9 @@ public class ScrollableSegmentedControl: UIControl {
             }
             
             segmentCell.showUnderline = segmentedControl.underlineSelected
+            if segmentedControl.underlineSelected {
+                segmentCell.tintColor = segmentedControl.tintColor
+            }
             
             return segmentCell
         }
@@ -350,6 +354,7 @@ public class ScrollableSegmentedControl: UIControl {
                         underlineView?.removeFromSuperview()
                     } else {
                         underlineView = UIView()
+                        underlineView!.tag = 999
                         underlineView!.backgroundColor = tintColor
                         underlineView!.isHidden = !isSelected
                         contentView.insertSubview(underlineView!, at: contentView.subviews.count)
@@ -357,6 +362,12 @@ public class ScrollableSegmentedControl: UIControl {
                     
                     configureConstraints()
                 }
+            }
+        }
+        
+        override var tintColor: UIColor!{
+            didSet{
+                underlineView?.backgroundColor = tintColor
             }
         }
         

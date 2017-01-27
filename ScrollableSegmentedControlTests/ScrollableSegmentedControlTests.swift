@@ -14,7 +14,8 @@ class ScrollableSegmentedControlTests: XCTestCase {
     
     override func setUp() {
         super.setUp()
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+        segmentedControl.frame = CGRect(x: 0, y: 0, width: 320, height: 100)
+        segmentedControl.layoutSubviews()
     }
     
     override func tearDown() {
@@ -60,6 +61,65 @@ class ScrollableSegmentedControlTests: XCTestCase {
         
         XCTAssert(collectionView?.numberOfSections == 1)
         XCTAssert(collectionView?.numberOfItems(inSection: 0) == 3)
+    }
+    
+    func testSelectedIndex(){
+        segmentedControl.insertSegment(withTitle: "segment 1", image: nil, at: 0)
+        segmentedControl.insertSegment(withTitle: "segment 2", image: nil, at: 1)
+        segmentedControl.insertSegment(withTitle: "segment 3", image: nil, at: 2)
+        
+        segmentedControl.underlineSelected = true
+        segmentedControl.selectedSegmentIndex = 1
+        
+        XCTAssert(segmentedControl.selectedSegmentIndex == 1)
+        
+        let collectionView = segmentedControl.viewWithTag(1) as? UICollectionView
+        XCTAssertNotNil(collectionView)
+        let indexPath = collectionView!.indexPathsForSelectedItems?.last
+        XCTAssert(indexPath?.item == 1)
+    }
+    
+    func testUnderlineIsPresent(){
+        segmentedControl.insertSegment(withTitle: "segment 1", image: nil, at: 0)
+        segmentedControl.insertSegment(withTitle: "segment 2", image: nil, at: 1)
+        segmentedControl.insertSegment(withTitle: "segment 3", image: nil, at: 2)
+        
+        let collectionView = segmentedControl.viewWithTag(1) as? UICollectionView
+        XCTAssertNotNil(collectionView)
+        
+        segmentedControl.underlineSelected = true
+        segmentedControl.selectedSegmentIndex = 1
+        
+       
+        let indexPath = collectionView!.indexPathsForSelectedItems?.last
+        XCTAssertNotNil(indexPath)
+        let cell = collectionView?.dataSource?.collectionView(collectionView!, cellForItemAt: indexPath!)
+        XCTAssertNotNil(cell)
+        
+        let underlineView = cell?.contentView.viewWithTag(999)
+        XCTAssertNotNil(underlineView)
+    }
+    
+    func testTintColor(){
+        segmentedControl.insertSegment(withTitle: "segment 1", image: nil, at: 0)
+        segmentedControl.insertSegment(withTitle: "segment 2", image: nil, at: 1)
+        segmentedControl.insertSegment(withTitle: "segment 3", image: nil, at: 2)
+        
+        let collectionView = segmentedControl.viewWithTag(1) as? UICollectionView
+        segmentedControl.underlineSelected = true
+        segmentedControl.selectedSegmentIndex = 1
+        
+        let indexPath = collectionView!.indexPathsForSelectedItems?.last
+        var cell = collectionView?.dataSource?.collectionView(collectionView!, cellForItemAt: indexPath!)
+        var underlineView = cell?.contentView.viewWithTag(999)
+        
+        let color = UIColor.purple
+        XCTAssertFalse(underlineView?.backgroundColor == color)
+        
+        segmentedControl.tintColor = color
+        cell = collectionView?.dataSource?.collectionView(collectionView!, cellForItemAt: indexPath!)
+        underlineView = cell?.contentView.viewWithTag(999)
+        XCTAssertTrue(underlineView?.backgroundColor == color)
     }
     
 //    func testPerformanceExample() {
