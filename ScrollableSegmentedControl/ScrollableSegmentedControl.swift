@@ -59,6 +59,18 @@ public class ScrollableSegmentedControl: UIControl {
         }
     }
     
+    private var _segmentContentColor:UIColor?
+    public dynamic var segmentContentColor:UIColor? {
+        get { return _segmentContentColor }
+        set { _segmentContentColor = newValue }
+    }
+    
+    private var _selectedSegmentContentColor:UIColor?
+    public dynamic var selectedSegmentContentColor:UIColor? {
+        get { return _selectedSegmentContentColor }
+        set { _selectedSegmentContentColor = newValue }
+    }
+    
     override public init(frame: CGRect) {
         super.init(frame: frame)
         configure()
@@ -325,6 +337,9 @@ public class ScrollableSegmentedControl: UIControl {
                 segmentCell.tintColor = segmentedControl.tintColor
             }
             
+            segmentCell.contentColor = segmentedControl.segmentContentColor
+            segmentCell.selectedContentColor = segmentedControl.selectedSegmentContentColor
+            
             return segmentCell
         }
         
@@ -346,6 +361,8 @@ public class ScrollableSegmentedControl: UIControl {
         static let defaultTextColor = UIColor.darkGray
         
         var underlineView:UIView?
+        public var contentColor:UIColor?
+        public var selectedContentColor:UIColor?
         
         var showUnderline:Bool = false {
             didSet {
@@ -411,16 +428,31 @@ public class ScrollableSegmentedControl: UIControl {
     private class TextOnlySegmentCollectionViewCell: BaseSegmentCollectionViewCell {
         let titleLabel = UILabel()
         
+        override var contentColor:UIColor? {
+            didSet {
+                titleLabel.textColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
+            }
+        }
+        
+        override var selectedContentColor:UIColor? {
+            didSet {
+                titleLabel.highlightedTextColor = (selectedContentColor == nil) ? UIColor.black : selectedContentColor!
+            }
+        }
+        
         override var isHighlighted: Bool {
             didSet {
-                titleLabel.textColor = (isHighlighted == true) ? UIColor.black : UIColor.darkGray
+                titleLabel.isHighlighted = isHighlighted
             }
         }
         
         override var isSelected: Bool {
             didSet {
-                titleLabel.textColor = (isSelected == true) ? UIColor.black : UIColor.darkGray
-                //titleLabel.font = (isSelected == true) ? UIFont.boldSystemFont(ofSize: 14) : UIFont.systemFont(ofSize: 14)
+                if isSelected {
+                    titleLabel.textColor = (selectedContentColor == nil) ? UIColor.black : selectedContentColor!
+                } else {
+                    titleLabel.textColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
+                }
             }
         }
         
@@ -441,6 +473,32 @@ public class ScrollableSegmentedControl: UIControl {
     private class ImageOnlySegmentCollectionViewCell: BaseSegmentCollectionViewCell {
         let imageView = UIImageView()
         
+        override var contentColor:UIColor? {
+            didSet {
+                imageView.tintColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
+            }
+        }
+        
+        override var isHighlighted: Bool {
+            didSet {
+                if isHighlighted {
+                    imageView.tintColor = (selectedContentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : selectedContentColor!
+                } else {
+                    imageView.tintColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
+                }
+            }
+        }
+        
+        override var isSelected: Bool {
+            didSet {
+                if isSelected {
+                    imageView.tintColor = (selectedContentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : selectedContentColor!
+                } else {
+                    imageView.tintColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
+                }
+            }
+        }
+        
         override func configure(){
             super.configure()
             
@@ -459,11 +517,46 @@ public class ScrollableSegmentedControl: UIControl {
         let titleLabel = UILabel()
         let imageView = UIImageView()
         
+        override var contentColor:UIColor? {
+            didSet {
+                titleLabel.textColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
+                imageView.tintColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
+            }
+        }
+        
+        override var selectedContentColor:UIColor? {
+            didSet {
+                titleLabel.highlightedTextColor = (selectedContentColor == nil) ? UIColor.black : selectedContentColor!
+            }
+        }
+        
+        override var isHighlighted: Bool {
+            didSet {
+                titleLabel.isHighlighted = isHighlighted
+                
+                if isHighlighted {
+                    imageView.tintColor = (selectedContentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : selectedContentColor!
+                } else {
+                    imageView.tintColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
+                }
+            }
+        }
+        
+        override var isSelected: Bool {
+            didSet {
+                if isSelected {
+                    titleLabel.textColor = (selectedContentColor == nil) ? UIColor.black : selectedContentColor!
+                    imageView.tintColor = (selectedContentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : selectedContentColor!
+                } else {
+                    titleLabel.textColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
+                    imageView.tintColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
+                }
+            }
+        }
+        
         override func configure(){
             super.configure()
-            titleLabel.textColor = BaseSegmentCollectionViewCell.defaultTextColor
             titleLabel.font = BaseSegmentCollectionViewCell.defaultFont
-            imageView.tintColor = BaseSegmentCollectionViewCell.defaultTextColor
             imageView.contentMode = .scaleAspectFit
             imageView.clipsToBounds = true
             
@@ -485,11 +578,46 @@ public class ScrollableSegmentedControl: UIControl {
         let titleLabel = UILabel()
         let imageView = UIImageView()
         
+        override var contentColor:UIColor? {
+            didSet {
+                titleLabel.textColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
+                imageView.tintColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
+            }
+        }
+        
+        override var selectedContentColor:UIColor? {
+            didSet {
+                titleLabel.highlightedTextColor = (selectedContentColor == nil) ? UIColor.black : selectedContentColor!
+            }
+        }
+        
+        override var isHighlighted: Bool {
+            didSet {
+                titleLabel.isHighlighted = isHighlighted
+                
+                if isHighlighted {
+                    imageView.tintColor = (selectedContentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : selectedContentColor!
+                } else {
+                    imageView.tintColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
+                }
+            }
+        }
+        
+        override var isSelected: Bool {
+            didSet {
+                if isSelected {
+                    titleLabel.textColor = (selectedContentColor == nil) ? UIColor.black : selectedContentColor!
+                    imageView.tintColor = (selectedContentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : selectedContentColor!
+                } else {
+                    titleLabel.textColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
+                    imageView.tintColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
+                }
+            }
+        }
+        
         override func configure(){
             super.configure()
-            titleLabel.textColor = BaseSegmentCollectionViewCell.defaultTextColor
             titleLabel.font = BaseSegmentCollectionViewCell.defaultFont
-            imageView.tintColor = BaseSegmentCollectionViewCell.defaultTextColor
             imageView.contentMode = .scaleAspectFit
             imageView.clipsToBounds = true
             
