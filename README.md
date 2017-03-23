@@ -48,10 +48,28 @@ override func viewDidLoad() {
     segmentedControl.underlineSelected = true
         
     segmentedControl.addTarget(self, action: #selector(TableViewController.segmentSelected(sender:)), for: .valueChanged)
+
+    // change some colors 
+    segmentedControl.segmentContentColor = UIColor.white
+    segmentedControl.selectedSegmentContentColor = UIColor.yellow
+    segmentedControl.backgroundColor = UIColor.black
 }
     
 func segmentSelected(sender:ScrollableSegmentedControl) {
     print("Segment at index \(sender.selectedSegmentIndex)  selected")
+}
+```
+
+Using appearance proxy to change some colors
+
+```swift
+func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+    let segmentedControlAppearance = ScrollableSegmentedControl.appearance()
+    segmentedControlAppearance.segmentContentColor = UIColor.white
+    segmentedControlAppearance.selectedSegmentContentColor = UIColor.yellow
+    segmentedControlAppearance.backgroundColor = UIColor.black
+
+    return true
 }
 ```
 
