@@ -17,8 +17,8 @@ A ScrollableSegmentedControl object is horizontaly scrollable control made of mu
  */
 @IBDesignable
 public class ScrollableSegmentedControl: UIControl {
-    private let flowLayout = UICollectionViewFlowLayout()
-    private var collectionView:UICollectionView?
+    fileprivate let flowLayout = UICollectionViewFlowLayout()
+    fileprivate var collectionView:UICollectionView?
     private var collectionViewController:CollectionViewController?
     private var segmentsData = [SegmentData]()
     private var longestTextWidth:CGFloat = 10
@@ -185,6 +185,8 @@ public class ScrollableSegmentedControl: UIControl {
         super.layoutSubviews()
         
         collectionView?.frame = CGRect(x: 0, y: 0, width: frame.size.width, height: frame.size.height)
+        collectionView?.contentOffset = CGPoint(x: 0, y: 0)
+        collectionView?.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
         
         configureSegmentSize()
         
