@@ -59,17 +59,18 @@ public class ScrollableSegmentedControl: UIControl {
         }
     }
     
-    private var _segmentContentColor:UIColor?
+    fileprivate var _segmentContentColor:UIColor?
     public dynamic var segmentContentColor:UIColor? {
         get { return _segmentContentColor }
         set { _segmentContentColor = newValue }
     }
     
-    private var _selectedSegmentContentColor:UIColor?
+    fileprivate var _selectedSegmentContentColor:UIColor?
     public dynamic var selectedSegmentContentColor:UIColor? {
         get { return _selectedSegmentContentColor }
         set { _selectedSegmentContentColor = newValue }
     }
+    
     
     override public init(frame: CGRect) {
         super.init(frame: frame)
@@ -79,6 +80,15 @@ public class ScrollableSegmentedControl: UIControl {
     required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         configure()
+    }
+    
+    fileprivate var _titleAttributes:[UInt: [AnyHashable : Any]] = [UInt: [AnyHashable : Any]]()
+    public func setTitleTextAttributes(_ attributes: [AnyHashable : Any]?, for state: UIControlState) {
+       _titleAttributes[state.rawValue] = attributes
+    }
+    
+    public func titleTextAttributes(for state: UIControlState) -> [AnyHashable : Any]? {
+        return _titleAttributes[state.rawValue]
     }
     
     // MARK: - Managing Segments
