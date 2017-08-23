@@ -3,7 +3,7 @@
 //  ScrollableSegmentedControl
 //
 //  Created by Goce Petrovski on 10/11/16.
-//  Copyright © 2016 Pomarium. All rights reserved.
+//  Copyright © 2017 Pomarium. All rights reserved.
 //
 
 import UIKit
@@ -56,19 +56,26 @@ public class ScrollableSegmentedControl: UIControl {
     override public var tintColor: UIColor! {
         didSet {
             collectionView?.tintColor = tintColor
+            collectionView?.reloadData()
         }
     }
     
     fileprivate var _segmentContentColor:UIColor?
     public dynamic var segmentContentColor:UIColor? {
         get { return _segmentContentColor }
-        set { _segmentContentColor = newValue }
+        set {
+            _segmentContentColor = newValue
+            collectionView?.reloadData()
+        }
     }
     
     fileprivate var _selectedSegmentContentColor:UIColor?
     public dynamic var selectedSegmentContentColor:UIColor? {
         get { return _selectedSegmentContentColor }
-        set { _selectedSegmentContentColor = newValue }
+        set {
+            _selectedSegmentContentColor = newValue
+            collectionView?.reloadData()
+        }
     }
     
     
@@ -82,12 +89,18 @@ public class ScrollableSegmentedControl: UIControl {
         configure()
     }
     
-    fileprivate var _titleAttributes:[UInt: [AnyHashable : Any]] = [UInt: [AnyHashable : Any]]()
-    public func setTitleTextAttributes(_ attributes: [AnyHashable : Any]?, for state: UIControlState) {
+    fileprivate var _titleAttributes:[UInt: [String : Any]] = [UInt: [String : Any]]()
+    public func setTitleTextAttributes(_ attributes: [String : Any]?, for state: UIControlState) {
        _titleAttributes[state.rawValue] = attributes
+        for segment in segmentsData {
+            if let title = segment.title {
+                calculateLongestTextWidth(text: title)
+            }
+        }
+        collectionView?.reloadData()
     }
     
-    public func titleTextAttributes(for state: UIControlState) -> [AnyHashable : Any]? {
+    public func titleTextAttributes(for state: UIControlState) -> [String : Any]? {
         return _titleAttributes[state.rawValue]
     }
     
@@ -255,7 +268,21 @@ public class ScrollableSegmentedControl: UIControl {
     }
     
     private func calculateLongestTextWidth(text:String) {
-        let fontAttributes = [NSFontAttributeName: BaseSegmentCollectionViewCell.defaultFont]
+        let fontAttributes:[String:Any]
+        if _titleAttributes.count > 0 {
+            if let selectedAttributes = _titleAttributes[UIControlState.selected.rawValue] {
+                fontAttributes = selectedAttributes
+            } else if let selectedAttributes = _titleAttributes[UIControlState.highlighted.rawValue] {
+                fontAttributes = selectedAttributes
+            } else if let selectedAttributes = _titleAttributes[UIControlState.normal.rawValue] {
+                fontAttributes = selectedAttributes
+            } else {
+                fontAttributes =  [NSFontAttributeName: BaseSegmentCollectionViewCell.defaultFont]
+            }
+        } else {
+           fontAttributes =  [NSFontAttributeName: BaseSegmentCollectionViewCell.defaultFont]
+        }
+        
         let size = (text as NSString).size(attributes: fontAttributes)
         let newLongestTextWidth = 2.0 + size.width + BaseSegmentCollectionViewCell.textPadding * 2
         if newLongestTextWidth > longestTextWidth {
@@ -284,7 +311,7 @@ public class ScrollableSegmentedControl: UIControl {
     
     // MARK: - SegmentData
     
-    private class SegmentData {
+    final private class SegmentData {
         var title:String?
         var image:UIImage?
     }
@@ -294,7 +321,7 @@ public class ScrollableSegmentedControl: UIControl {
     /**
      A CollectionViewController is private inner class with main purpose to hide UICollectionView protocol conformances.
      */
-    private class CollectionViewController : NSObject, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout{
+    final private class CollectionViewController : NSObject, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout{
         static let textOnlyCellIdentifier = "textOnlyCellIdentifier"
         static let imageOnlyCellIdentifier = "imageOnlyCellIdentifier"
         static let imageOnTopCellIdentifier = "imageOnTopCellIdentifier"
@@ -324,7 +351,11 @@ public class ScrollableSegmentedControl: UIControl {
             switch segmentedControl.segmentStyle {
             case .textOnly:
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CollectionViewController.textOnlyCellIdentifier, for: indexPath) as! TextOnlySegmentCollectionViewCell
-                cell.titleLabel.text = data.title
+                if let normalAttributes = segmentedControl._titleAttributes[UIControlState.normal.rawValue], data.title != nil {
+                    cell.titleLabel.attributedText = NSAttributedString(string: data.title!, attributes: normalAttributes)
+                } else {
+                    cell.titleLabel.text = data.title
+                }
                 segmentCell = cell
             case .imageOnly:
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CollectionViewController.imageOnlyCellIdentifier, for: indexPath) as! ImageOnlySegmentCollectionViewCell
@@ -349,6 +380,7 @@ public class ScrollableSegmentedControl: UIControl {
                 segmentCell.tintColor = segmentedControl.tintColor
             }
             
+            
             segmentCell.contentColor = segmentedControl.segmentContentColor
             segmentCell.selectedContentColor = segmentedControl.selectedSegmentContentColor
             
@@ -357,8 +389,41 @@ public class ScrollableSegmentedControl: UIControl {
         
         // MARK UICollectionViewDelegate
         
+        fileprivate func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+            if let labelContainerCell = cell as? LabelContainerCell {
+                // check is selected or highlited first
+                if let normalAttributes = segmentedControl._titleAttributes[UIControlState.normal.rawValue], labelContainerCell.titleLabel.text != nil {
+                    labelContainerCell.titleLabel.attributedText = NSAttributedString(string: labelContainerCell.titleLabel.text!, attributes: normalAttributes)
+                } else {
+                    labelContainerCell.titleLabel.text = labelContainerCell.titleLabel.text
+                }
+            }
+        }
+        
+        fileprivate func collectionView(_ collectionView: UICollectionView, didHighlightItemAt indexPath: IndexPath) {
+            if let labelContainerCell = collectionView.cellForItem(at: indexPath) as? LabelContainerCell {
+                labelContainerCell.titleLabel.textColor = (segmentedControl.selectedSegmentContentColor == nil) ? UIColor.black : segmentedControl.selectedSegmentContentColor!
+            }
+        }
+        
+        fileprivate func collectionView(_ collectionView: UICollectionView, didUnhighlightItemAt indexPath: IndexPath) {
+            if let labelContainerCell = collectionView.cellForItem(at: indexPath) as? LabelContainerCell {
+                labelContainerCell.titleLabel.textColor = (segmentedControl.segmentContentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : segmentedControl.segmentContentColor!
+            }
+        }
+        
         fileprivate func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
             segmentedControl.selectedSegmentIndex = indexPath.item
+            
+            if let labelContainerCell = collectionView.cellForItem(at: indexPath) as? LabelContainerCell {
+                labelContainerCell.titleLabel.textColor = (segmentedControl.selectedSegmentContentColor == nil) ? UIColor.black : segmentedControl.selectedSegmentContentColor!
+            }
+        }
+        
+        fileprivate func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
+            if let labelContainerCell = collectionView.cellForItem(at: indexPath) as? LabelContainerCell {
+                labelContainerCell.titleLabel.textColor = (segmentedControl.segmentContentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : segmentedControl.segmentContentColor!
+            }
         }
     }
 
@@ -437,7 +502,7 @@ public class ScrollableSegmentedControl: UIControl {
         }
     }
     
-    private class TextOnlySegmentCollectionViewCell: BaseSegmentCollectionViewCell {
+    private class TextOnlySegmentCollectionViewCell: BaseSegmentCollectionViewCell, LabelContainerCell {
         let titleLabel = UILabel()
         
         override var contentColor:UIColor? {
@@ -445,28 +510,28 @@ public class ScrollableSegmentedControl: UIControl {
                 titleLabel.textColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
             }
         }
+//
+//        override var selectedContentColor:UIColor? {
+//            didSet {
+//                titleLabel.highlightedTextColor = (selectedContentColor == nil) ? UIColor.black : selectedContentColor!
+//            }
+//        }
         
-        override var selectedContentColor:UIColor? {
-            didSet {
-                titleLabel.highlightedTextColor = (selectedContentColor == nil) ? UIColor.black : selectedContentColor!
-            }
-        }
-        
-        override var isHighlighted: Bool {
-            didSet {
-                titleLabel.isHighlighted = isHighlighted
-            }
-        }
-        
-        override var isSelected: Bool {
-            didSet {
-                if isSelected {
-                    titleLabel.textColor = (selectedContentColor == nil) ? UIColor.black : selectedContentColor!
-                } else {
-                    titleLabel.textColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
-                }
-            }
-        }
+//        override var isHighlighted: Bool {
+//            didSet {
+//                titleLabel.isHighlighted = isHighlighted
+//            }
+//        }
+//
+//        override var isSelected: Bool {
+//            didSet {
+//                if isSelected {
+//                    titleLabel.textColor = (selectedContentColor == nil) ? UIColor.black : selectedContentColor!
+//                } else {
+//                    titleLabel.textColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
+//                }
+//            }
+//        }
         
         override func configure(){
             super.configure()
@@ -482,7 +547,7 @@ public class ScrollableSegmentedControl: UIControl {
         }
     }
     
-    private class ImageOnlySegmentCollectionViewCell: BaseSegmentCollectionViewCell {
+    private class ImageOnlySegmentCollectionViewCell: BaseSegmentCollectionViewCell, ImageContainerCell {
         let imageView = UIImageView()
         
         override var contentColor:UIColor? {
@@ -525,7 +590,7 @@ public class ScrollableSegmentedControl: UIControl {
         }
     }
     
-    private class ImageOnTopSegmentCollectionViewCell: BaseSegmentCollectionViewCell {
+    private class ImageOnTopSegmentCollectionViewCell: BaseSegmentCollectionViewCell, LabelContainerCell, ImageContainerCell {
         let titleLabel = UILabel()
         let imageView = UIImageView()
         
@@ -586,7 +651,7 @@ public class ScrollableSegmentedControl: UIControl {
         }
     }
     
-    private class ImageOnLeftSegmentCollectionViewCell: BaseSegmentCollectionViewCell {
+    private class ImageOnLeftSegmentCollectionViewCell: BaseSegmentCollectionViewCell, LabelContainerCell, ImageContainerCell {
         let titleLabel = UILabel()
         let imageView = UIImageView()
         
@@ -648,4 +713,12 @@ public class ScrollableSegmentedControl: UIControl {
             contentView.trailingAnchor.constraint(greaterThanOrEqualTo: titleLabel.trailingAnchor, constant: BaseSegmentCollectionViewCell.textPadding).isActive = true
         }
     }
+}
+
+fileprivate protocol LabelContainerCell {
+    var titleLabel:UILabel { get }
+}
+
+fileprivate protocol ImageContainerCell {
+    var imageView:UIImageView { get }
 }

@@ -15,6 +15,10 @@ class TableViewController: UITableViewController {
     @IBOutlet weak var removeSegmentButton: UIBarButtonItem!
     
     var selectedIndexPath = IndexPath(row: 0, section: 0)
+    var selectedAttributesIndexPath = IndexPath(row: 0, section: 1)
+    
+    let largerRedTextAttributes = [NSFontAttributeName: UIFont.systemFont(ofSize: 16),
+                      NSForegroundColorAttributeName: UIColor.red]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -53,40 +57,66 @@ class TableViewController: UITableViewController {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     
-        if let cell = tableView.cellForRow(at: selectedIndexPath) {
-            cell.accessoryType = .none
+    override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        if indexPath.section == 1 && indexPath.row == 1 {
+            cell.textLabel!.attributedText = NSAttributedString(string: cell.textLabel!.text!, attributes: largerRedTextAttributes)
         }
-        selectedIndexPath = indexPath
-        if let cell = tableView.cellForRow(at: selectedIndexPath) {
-            cell.accessoryType = .checkmark
-        }
-        
-        var height = 44
-        switch indexPath.row {
-        case 0:
-            segmentedControl.segmentStyle = .textOnly
-        case 1:
-            segmentedControl.segmentStyle = .imageOnly
-            height = 52
-        case 2:
-            segmentedControl.segmentStyle = .imageOnTop
-            height = 60
-        case 3:
-            segmentedControl.segmentStyle = .imageOnLeft
-        default: break
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if indexPath.section == 0 {
+            if let cell = tableView.cellForRow(at: selectedIndexPath) {
+                cell.accessoryType = .none
+            }
+            selectedIndexPath = indexPath
+            if let cell = tableView.cellForRow(at: selectedIndexPath) {
+                cell.accessoryType = .checkmark
+            }
             
+            var height = 44
+            switch indexPath.row {
+            case 0:
+                segmentedControl.segmentStyle = .textOnly
+            case 1:
+                segmentedControl.segmentStyle = .imageOnly
+                height = 52
+            case 2:
+                segmentedControl.segmentStyle = .imageOnTop
+                height = 60
+            case 3:
+                segmentedControl.segmentStyle = .imageOnLeft
+            default: break
+                
+            }
+            
+            let headerView = tableView.tableHeaderView!
+            tableView.tableHeaderView = nil
+            var headerFrame = headerView.frame
+            
+            headerFrame.size.height =  CGFloat(height)
+            headerView.frame = headerFrame
+            tableView.tableHeaderView = headerView
+        } else {
+            if let cell = tableView.cellForRow(at: selectedAttributesIndexPath) {
+                cell.accessoryType = .none
+            }
+            selectedAttributesIndexPath = indexPath
+            if let cell = tableView.cellForRow(at: selectedAttributesIndexPath) {
+                cell.accessoryType = .checkmark
+            }
+            
+            switch indexPath.row {
+            case 0:
+                segmentedControl.setTitleTextAttributes(nil, for: .normal)
+            case 1:
+                let attributes = [NSFontAttributeName: UIFont.systemFont(ofSize: 16),
+                                  NSForegroundColorAttributeName: UIColor.red]
+                segmentedControl.setTitleTextAttributes(attributes, for: .normal)
+            default: break
+                
+            }
         }
-        
-        let headerView = tableView.tableHeaderView!
-        tableView.tableHeaderView = nil
-        var headerFrame = headerView.frame
- 
-        headerFrame.size.height =  CGFloat(height)
-        headerView.frame = headerFrame
-        tableView.tableHeaderView = headerView
         
         tableView.deselectRow(at: indexPath, animated: true)
     }
