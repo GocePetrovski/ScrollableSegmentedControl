@@ -19,6 +19,10 @@ class TableViewController: UITableViewController {
     
     let largerRedTextAttributes = [NSFontAttributeName: UIFont.systemFont(ofSize: 16),
                       NSForegroundColorAttributeName: UIColor.red]
+    let largerRedTextHighlightAttributes = [NSFontAttributeName: UIFont.systemFont(ofSize: 16),
+                                   NSForegroundColorAttributeName: UIColor.blue]
+    let largerRedTextSelectAttributes = [NSFontAttributeName: UIFont.systemFont(ofSize: 16),
+                                          NSForegroundColorAttributeName: UIColor.orange]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -109,10 +113,12 @@ class TableViewController: UITableViewController {
             switch indexPath.row {
             case 0:
                 segmentedControl.setTitleTextAttributes(nil, for: .normal)
+                segmentedControl.setTitleTextAttributes(nil, for: .highlighted)
+                segmentedControl.setTitleTextAttributes(nil, for: .selected)
             case 1:
-                let attributes = [NSFontAttributeName: UIFont.systemFont(ofSize: 16),
-                                  NSForegroundColorAttributeName: UIColor.red]
-                segmentedControl.setTitleTextAttributes(attributes, for: .normal)
+                segmentedControl.setTitleTextAttributes(largerRedTextAttributes, for: .normal)
+                segmentedControl.setTitleTextAttributes(largerRedTextHighlightAttributes, for: .highlighted)
+                segmentedControl.setTitleTextAttributes(largerRedTextSelectAttributes, for: .selected)
             default: break
                 
             }
