@@ -13,7 +13,7 @@ public enum ScrollableSegmentedControlSegmentStyle {
 }
 
 /**
-A ScrollableSegmentedControl object is horizontaly scrollable control made of multiple segments, each segment functioning as discrete button.
+ A ScrollableSegmentedControl object is horizontaly scrollable control made of multiple segments, each segment functioning as discrete button.
  */
 @IBDesignable
 public class ScrollableSegmentedControl: UIControl {
@@ -45,7 +45,7 @@ public class ScrollableSegmentedControl: UIControl {
                 
                 if indexPath != nil {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.05, execute: {
-                       self.collectionView?.selectItem(at: indexPath, animated: true, scrollPosition: UICollectionViewScrollPosition.left)
+                        self.collectionView?.selectItem(at: indexPath, animated: true, scrollPosition: UICollectionViewScrollPosition.left)
                     })
                 }
                 
@@ -89,15 +89,63 @@ public class ScrollableSegmentedControl: UIControl {
         configure()
     }
     
+    fileprivate var normalAttributes:[String : Any]?
+    fileprivate var highlightedAttributes:[String : Any]?
+    fileprivate var selectedAttributes:[String : Any]?
     fileprivate var _titleAttributes:[UInt: [String : Any]] = [UInt: [String : Any]]()
     public func setTitleTextAttributes(_ attributes: [String : Any]?, for state: UIControlState) {
-       _titleAttributes[state.rawValue] = attributes
+        _titleAttributes[state.rawValue] = attributes
+        
+        normalAttributes = _titleAttributes[UIControlState.normal.rawValue]
+        highlightedAttributes = _titleAttributes[UIControlState.highlighted.rawValue]
+        selectedAttributes = _titleAttributes[UIControlState.selected.rawValue]
+        
         for segment in segmentsData {
+            configureAttributedTitlesForSegment(segment)
+            
             if let title = segment.title {
                 calculateLongestTextWidth(text: title)
             }
         }
+        
+        flowLayout.invalidateLayout()
         collectionView?.reloadData()
+    }
+    
+    private func configureAttributedTitlesForSegment(_ segment:SegmentData) {
+        segment.normalAttributedTitle = nil
+        segment.highlightedAttributedTitle = nil
+        segment.selectedAttributedTitle = nil
+        
+        if let title = segment.title {
+            if normalAttributes != nil {
+                segment.normalAttributedTitle = NSAttributedString(string: title, attributes: normalAttributes!)
+            }
+            
+            if highlightedAttributes != nil {
+                segment.highlightedAttributedTitle = NSAttributedString(string: title, attributes: highlightedAttributes!)
+            } else {
+                if selectedAttributes != nil {
+                    segment.highlightedAttributedTitle = NSAttributedString(string: title, attributes: selectedAttributes!)
+                } else {
+                    if normalAttributes != nil {
+                        segment.highlightedAttributedTitle = NSAttributedString(string: title, attributes: normalAttributes!)
+                    }
+                }
+            }
+            
+            if selectedAttributes != nil {
+                segment.selectedAttributedTitle = NSAttributedString(string: title, attributes: selectedAttributes!)
+            } else {
+                if highlightedAttributes != nil {
+                    segment.selectedAttributedTitle = NSAttributedString(string: title, attributes: highlightedAttributes!)
+                } else {
+                    if normalAttributes != nil {
+                        segment.selectedAttributedTitle = NSAttributedString(string: title, attributes: normalAttributes!)
+                    }
+                }
+            }
+        }
     }
     
     public func titleTextAttributes(for state: UIControlState) -> [String : Any]? {
@@ -112,6 +160,7 @@ public class ScrollableSegmentedControl: UIControl {
     public func insertSegment(withTitle title: String, at index: Int) {
         let segment = SegmentData()
         segment.title = title
+        configureAttributedTitlesForSegment(segment)
         segmentsData.insert(segment, at: index)
         calculateLongestTextWidth(text: title)
         collectionView?.reloadData()
@@ -198,7 +247,7 @@ public class ScrollableSegmentedControl: UIControl {
     
     /**
      Configure if the selected segment should have underline. Default value is false.
-    */
+     */
     @IBInspectable
     public var underlineSelected:Bool = false
     
@@ -269,18 +318,14 @@ public class ScrollableSegmentedControl: UIControl {
     
     private func calculateLongestTextWidth(text:String) {
         let fontAttributes:[String:Any]
-        if _titleAttributes.count > 0 {
-            if let selectedAttributes = _titleAttributes[UIControlState.selected.rawValue] {
-                fontAttributes = selectedAttributes
-            } else if let selectedAttributes = _titleAttributes[UIControlState.highlighted.rawValue] {
-                fontAttributes = selectedAttributes
-            } else if let selectedAttributes = _titleAttributes[UIControlState.normal.rawValue] {
-                fontAttributes = selectedAttributes
-            } else {
-                fontAttributes =  [NSFontAttributeName: BaseSegmentCollectionViewCell.defaultFont]
-            }
+        if normalAttributes != nil {
+            fontAttributes = normalAttributes!
+        } else  if highlightedAttributes != nil {
+            fontAttributes = highlightedAttributes!
+        } else if selectedAttributes != nil {
+            fontAttributes = selectedAttributes!
         } else {
-           fontAttributes =  [NSFontAttributeName: BaseSegmentCollectionViewCell.defaultFont]
+            fontAttributes =  [NSFontAttributeName: BaseSegmentCollectionViewCell.defaultFont]
         }
         
         let size = (text as NSString).size(attributes: fontAttributes)
@@ -290,7 +335,7 @@ public class ScrollableSegmentedControl: UIControl {
             configureSegmentSize()
         }
     }
-
+    
     private func safeSegmentData(forIndex index:Int) -> SegmentData {
         let segmentData:SegmentData
         
@@ -304,7 +349,7 @@ public class ScrollableSegmentedControl: UIControl {
         
         return segmentData
     }
-  
+    
     /*
      Private internal classes to be used only by this class.
      */
@@ -313,6 +358,9 @@ public class ScrollableSegmentedControl: UIControl {
     
     final private class SegmentData {
         var title:String?
+        var normalAttributedTitle:NSAttributedString?
+        var highlightedAttributedTitle:NSAttributedString?
+        var selectedAttributedTitle:NSAttributedString?
         var image:UIImage?
     }
     
@@ -351,8 +399,8 @@ public class ScrollableSegmentedControl: UIControl {
             switch segmentedControl.segmentStyle {
             case .textOnly:
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CollectionViewController.textOnlyCellIdentifier, for: indexPath) as! TextOnlySegmentCollectionViewCell
-                if let normalAttributes = segmentedControl._titleAttributes[UIControlState.normal.rawValue], data.title != nil {
-                    cell.titleLabel.attributedText = NSAttributedString(string: data.title!, attributes: normalAttributes)
+                if data.normalAttributedTitle != nil {
+                    cell.titleLabel.attributedText = data.normalAttributedTitle
                 } else {
                     cell.titleLabel.text = data.title
                 }
@@ -384,341 +432,354 @@ public class ScrollableSegmentedControl: UIControl {
             segmentCell.contentColor = segmentedControl.segmentContentColor
             segmentCell.selectedContentColor = segmentedControl.selectedSegmentContentColor
             
+            segmentCell.normalAttributedTitle = data.normalAttributedTitle
+            segmentCell.highlightedAttributedTitle = data.highlightedAttributedTitle
+            segmentCell.selectedAttributedTitle = data.selectedAttributedTitle
+            
             return segmentCell
         }
         
         // MARK UICollectionViewDelegate
         
-        fileprivate func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-            if let labelContainerCell = cell as? LabelContainerCell {
-                // check is selected or highlited first
-                if let normalAttributes = segmentedControl._titleAttributes[UIControlState.normal.rawValue], labelContainerCell.titleLabel.text != nil {
-                    labelContainerCell.titleLabel.attributedText = NSAttributedString(string: labelContainerCell.titleLabel.text!, attributes: normalAttributes)
-                } else {
-                    labelContainerCell.titleLabel.text = labelContainerCell.titleLabel.text
-                }
-            }
-        }
+        //        fileprivate func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        //            if let labelContainerCell = cell as? LabelContainerCell {
+        //                // check is selected or highlited first
+        //                if let normalAttributes = segmentedControl._titleAttributes[UIControlState.normal.rawValue], labelContainerCell.titleLabel.text != nil {
+        //                    labelContainerCell.titleLabel.attributedText = NSAttributedString(string: labelContainerCell.titleLabel.text!, attributes: normalAttributes)
+        //                } else {
+        //                    labelContainerCell.titleLabel.text = labelContainerCell.titleLabel.text
+        //                }
+        //            }
+        //        }
+        //
+        //        fileprivate func collectionView(_ collectionView: UICollectionView, didHighlightItemAt indexPath: IndexPath) {
+        //            if let labelContainerCell = collectionView.cellForItem(at: indexPath) as? LabelContainerCell {
+        //                labelContainerCell.titleLabel.textColor = (segmentedControl.selectedSegmentContentColor == nil) ? UIColor.black : segmentedControl.selectedSegmentContentColor!
+        //            }
+        //        }
+        //
+        //        fileprivate func collectionView(_ collectionView: UICollectionView, didUnhighlightItemAt indexPath: IndexPath) {
+        //            if let labelContainerCell = collectionView.cellForItem(at: indexPath) as? LabelContainerCell {
+        //                labelContainerCell.titleLabel.textColor = (segmentedControl.segmentContentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : segmentedControl.segmentContentColor!
+        //            }
+        //        }
+        //
+        //        fileprivate func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        //            segmentedControl.selectedSegmentIndex = indexPath.item
+        //
+        //            if let labelContainerCell = collectionView.cellForItem(at: indexPath) as? LabelContainerCell {
+        //                labelContainerCell.titleLabel.textColor = (segmentedControl.selectedSegmentContentColor == nil) ? UIColor.black : segmentedControl.selectedSegmentContentColor!
+        //            }
+        //        }
+        //
+        //        fileprivate func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
+        //            if let labelContainerCell = collectionView.cellForItem(at: indexPath) as? LabelContainerCell {
+        //                labelContainerCell.titleLabel.textColor = (segmentedControl.segmentContentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : segmentedControl.segmentContentColor!
+        //            }
+        //        }
+        //    }
         
-        fileprivate func collectionView(_ collectionView: UICollectionView, didHighlightItemAt indexPath: IndexPath) {
-            if let labelContainerCell = collectionView.cellForItem(at: indexPath) as? LabelContainerCell {
-                labelContainerCell.titleLabel.textColor = (segmentedControl.selectedSegmentContentColor == nil) ? UIColor.black : segmentedControl.selectedSegmentContentColor!
-            }
-        }
         
-        fileprivate func collectionView(_ collectionView: UICollectionView, didUnhighlightItemAt indexPath: IndexPath) {
-            if let labelContainerCell = collectionView.cellForItem(at: indexPath) as? LabelContainerCell {
-                labelContainerCell.titleLabel.textColor = (segmentedControl.segmentContentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : segmentedControl.segmentContentColor!
-            }
-        }
+        // MARK: - SegmentCollectionViewCell
         
-        fileprivate func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-            segmentedControl.selectedSegmentIndex = indexPath.item
+        private class BaseSegmentCollectionViewCell: UICollectionViewCell {
+            static let textPadding:CGFloat = 8.0
+            static let imageToTextMargin:CGFloat = 14.0
+            static let imageSize:CGFloat = 14.0
+            static let defaultFont = UIFont.systemFont(ofSize: 14)
+            static let defaultTextColor = UIColor.darkGray
             
-            if let labelContainerCell = collectionView.cellForItem(at: indexPath) as? LabelContainerCell {
-                labelContainerCell.titleLabel.textColor = (segmentedControl.selectedSegmentContentColor == nil) ? UIColor.black : segmentedControl.selectedSegmentContentColor!
-            }
-        }
-        
-        fileprivate func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
-            if let labelContainerCell = collectionView.cellForItem(at: indexPath) as? LabelContainerCell {
-                labelContainerCell.titleLabel.textColor = (segmentedControl.segmentContentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : segmentedControl.segmentContentColor!
-            }
-        }
-    }
-
-    
-    // MARK: - SegmentCollectionViewCell
-    
-    private class BaseSegmentCollectionViewCell: UICollectionViewCell {
-        static let textPadding:CGFloat = 8.0
-        static let imageToTextMargin:CGFloat = 14.0
-        static let imageSize:CGFloat = 14.0
-        static let defaultFont = UIFont.systemFont(ofSize: 14)
-        static let defaultTextColor = UIColor.darkGray
-        
-        var underlineView:UIView?
-        public var contentColor:UIColor?
-        public var selectedContentColor:UIColor?
-        
-        var showUnderline:Bool = false {
-            didSet {
-                if oldValue != showUnderline {
-                    if oldValue == false && underlineView != nil {
-                        underlineView?.removeFromSuperview()
-                    } else {
-                        underlineView = UIView()
-                        underlineView!.tag = 999
-                        underlineView!.backgroundColor = tintColor
-                        underlineView!.isHidden = !isSelected
-                        contentView.insertSubview(underlineView!, at: contentView.subviews.count)
+            var underlineView:UIView?
+            public var contentColor:UIColor?
+            public var selectedContentColor:UIColor?
+            
+            var normalAttributedTitle:NSAttributedString?
+            var highlightedAttributedTitle:NSAttributedString?
+            var selectedAttributedTitle:NSAttributedString?
+            
+            var showUnderline:Bool = false {
+                didSet {
+                    if oldValue != showUnderline {
+                        if oldValue == false && underlineView != nil {
+                            underlineView?.removeFromSuperview()
+                        } else {
+                            underlineView = UIView()
+                            underlineView!.tag = 999
+                            underlineView!.backgroundColor = tintColor
+                            underlineView!.isHidden = !isSelected
+                            contentView.insertSubview(underlineView!, at: contentView.subviews.count)
+                        }
+                        
+                        configureConstraints()
                     }
+                }
+            }
+            
+            override var tintColor: UIColor!{
+                didSet{
+                    underlineView?.backgroundColor = tintColor
+                }
+            }
+            
+            override init(frame: CGRect) {
+                super.init(frame: frame)
+                configure()
+            }
+            
+            required init?(coder aDecoder: NSCoder) {
+                super.init(coder: aDecoder)
+                configure()
+            }
+            
+            func configure() {
+                configureConstraints()
+            }
+            
+            private func configureConstraints() {
+                if let underline = underlineView {
+                    underline.translatesAutoresizingMaskIntoConstraints = false
+                    underline.heightAnchor.constraint(equalToConstant: 3.0).isActive = true
+                    underline.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
+                    underline.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
+                    underline.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
+                }
+            }
+            
+            override var isHighlighted: Bool {
+                didSet {
+                    underlineView?.isHidden = !isHighlighted
+                }
+            }
+            
+            override var isSelected: Bool {
+                didSet {
+                    underlineView?.isHidden = !isSelected
+                }
+            }
+        }
+        
+        private class TextOnlySegmentCollectionViewCell: BaseSegmentCollectionViewCell {
+            let titleLabel = UILabel()
+            
+            override var contentColor:UIColor? {
+                didSet {
+                    titleLabel.textColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
+                }
+            }
+            
+            override var selectedContentColor:UIColor? {
+                didSet {
+                    titleLabel.highlightedTextColor = (selectedContentColor == nil) ? UIColor.black : selectedContentColor!
+                }
+            }
+            
+            override var isHighlighted: Bool {
+                didSet {
+                    if let title = (isHighlighted) ? super.highlightedAttributedTitle : super.normalAttributedTitle {
+                        titleLabel.attributedText = title
+                    } else {
+                        titleLabel.isHighlighted = isHighlighted
+                    }
+                }
+            }
+            
+            override var isSelected: Bool {
+                didSet {
+                    if isSelected {
+                        if let title = super.selectedAttributedTitle {
+                            titleLabel.attributedText = title
+                        } else {
+                            titleLabel.textColor = (selectedContentColor == nil) ? UIColor.black : selectedContentColor!
+                        }
+                    } else {
+                        if let title = super.selectedAttributedTitle {
+                            titleLabel.attributedText = title
+                        } else {
+                            titleLabel.textColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
+                        }
+                    }
+                }
+            }
+            
+            override func configure(){
+                super.configure()
+                contentView.addSubview(titleLabel)
+                titleLabel.translatesAutoresizingMaskIntoConstraints = false
+                titleLabel.textColor = BaseSegmentCollectionViewCell.defaultTextColor
+                titleLabel.font = BaseSegmentCollectionViewCell.defaultFont
+                
+                titleLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
+                titleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor).isActive = true
+                titleLabel.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.leadingAnchor, constant: BaseSegmentCollectionViewCell.textPadding).isActive = true
+                contentView.trailingAnchor.constraint(greaterThanOrEqualTo: titleLabel.trailingAnchor, constant: BaseSegmentCollectionViewCell.textPadding).isActive = true
+            }
+        }
+        
+        private class ImageOnlySegmentCollectionViewCell: BaseSegmentCollectionViewCell {
+            let imageView = UIImageView()
+            
+            override var contentColor:UIColor? {
+                didSet {
+                    imageView.tintColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
+                }
+            }
+            
+            override var isHighlighted: Bool {
+                didSet {
+                    if isHighlighted {
+                        imageView.tintColor = (selectedContentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : selectedContentColor!
+                    } else {
+                        imageView.tintColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
+                    }
+                }
+            }
+            
+            override var isSelected: Bool {
+                didSet {
+                    if isSelected {
+                        imageView.tintColor = (selectedContentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : selectedContentColor!
+                    } else {
+                        imageView.tintColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
+                    }
+                }
+            }
+            
+            override func configure(){
+                super.configure()
+                
+                contentView.addSubview(imageView)
+                imageView.translatesAutoresizingMaskIntoConstraints = false
+                imageView.tintColor = BaseSegmentCollectionViewCell.defaultTextColor
+                
+                imageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
+                imageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor).isActive = true
+                imageView.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.leadingAnchor, constant: BaseSegmentCollectionViewCell.textPadding).isActive = true
+                contentView.trailingAnchor.constraint(greaterThanOrEqualTo: imageView.trailingAnchor, constant: BaseSegmentCollectionViewCell.textPadding).isActive = true
+            }
+        }
+        
+        private class ImageOnTopSegmentCollectionViewCell: BaseSegmentCollectionViewCell {
+            let titleLabel = UILabel()
+            let imageView = UIImageView()
+            
+            override var contentColor:UIColor? {
+                didSet {
+                    titleLabel.textColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
+                    imageView.tintColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
+                }
+            }
+            
+            override var selectedContentColor:UIColor? {
+                didSet {
+                    titleLabel.highlightedTextColor = (selectedContentColor == nil) ? UIColor.black : selectedContentColor!
+                }
+            }
+            
+            override var isHighlighted: Bool {
+                didSet {
+                    titleLabel.isHighlighted = isHighlighted
                     
-                    configureConstraints()
+                    if isHighlighted {
+                        imageView.tintColor = (selectedContentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : selectedContentColor!
+                    } else {
+                        imageView.tintColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
+                    }
                 }
             }
-        }
-        
-        override var tintColor: UIColor!{
-            didSet{
-                underlineView?.backgroundColor = tintColor
-            }
-        }
-        
-        override init(frame: CGRect) {
-            super.init(frame: frame)
-            configure()
-        }
-        
-        required init?(coder aDecoder: NSCoder) {
-            super.init(coder: aDecoder)
-            configure()
-        }
-        
-        func configure() {
-            configureConstraints()
-        }
-        
-        private func configureConstraints() {
-            if let underline = underlineView {
-                underline.translatesAutoresizingMaskIntoConstraints = false
-                underline.heightAnchor.constraint(equalToConstant: 3.0).isActive = true
-                underline.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
-                underline.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
-                underline.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
-            }
-        }
-        
-        override var isHighlighted: Bool {
-            didSet {
-                underlineView?.isHidden = !isHighlighted
-            }
-        }
-        
-        override var isSelected: Bool {
-            didSet {
-                underlineView?.isHidden = !isSelected
-            }
-        }
-    }
-    
-    private class TextOnlySegmentCollectionViewCell: BaseSegmentCollectionViewCell, LabelContainerCell {
-        let titleLabel = UILabel()
-        
-        override var contentColor:UIColor? {
-            didSet {
-                titleLabel.textColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
-            }
-        }
-//
-//        override var selectedContentColor:UIColor? {
-//            didSet {
-//                titleLabel.highlightedTextColor = (selectedContentColor == nil) ? UIColor.black : selectedContentColor!
-//            }
-//        }
-        
-//        override var isHighlighted: Bool {
-//            didSet {
-//                titleLabel.isHighlighted = isHighlighted
-//            }
-//        }
-//
-//        override var isSelected: Bool {
-//            didSet {
-//                if isSelected {
-//                    titleLabel.textColor = (selectedContentColor == nil) ? UIColor.black : selectedContentColor!
-//                } else {
-//                    titleLabel.textColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
-//                }
-//            }
-//        }
-        
-        override func configure(){
-            super.configure()
-            contentView.addSubview(titleLabel)
-            titleLabel.translatesAutoresizingMaskIntoConstraints = false
-            titleLabel.textColor = BaseSegmentCollectionViewCell.defaultTextColor
-            titleLabel.font = BaseSegmentCollectionViewCell.defaultFont
             
-            titleLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
-            titleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor).isActive = true
-            titleLabel.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.leadingAnchor, constant: BaseSegmentCollectionViewCell.textPadding).isActive = true
-            contentView.trailingAnchor.constraint(greaterThanOrEqualTo: titleLabel.trailingAnchor, constant: BaseSegmentCollectionViewCell.textPadding).isActive = true
-        }
-    }
-    
-    private class ImageOnlySegmentCollectionViewCell: BaseSegmentCollectionViewCell, ImageContainerCell {
-        let imageView = UIImageView()
-        
-        override var contentColor:UIColor? {
-            didSet {
-                imageView.tintColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
-            }
-        }
-        
-        override var isHighlighted: Bool {
-            didSet {
-                if isHighlighted {
-                    imageView.tintColor = (selectedContentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : selectedContentColor!
-                } else {
-                    imageView.tintColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
+            override var isSelected: Bool {
+                didSet {
+                    if isSelected {
+                        titleLabel.textColor = (selectedContentColor == nil) ? UIColor.black : selectedContentColor!
+                        imageView.tintColor = (selectedContentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : selectedContentColor!
+                    } else {
+                        titleLabel.textColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
+                        imageView.tintColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
+                    }
                 }
             }
-        }
-        
-        override var isSelected: Bool {
-            didSet {
-                if isSelected {
-                    imageView.tintColor = (selectedContentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : selectedContentColor!
-                } else {
-                    imageView.tintColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
-                }
-            }
-        }
-        
-        override func configure(){
-            super.configure()
             
-            contentView.addSubview(imageView)
-            imageView.translatesAutoresizingMaskIntoConstraints = false
-            imageView.tintColor = BaseSegmentCollectionViewCell.defaultTextColor
-            
-            imageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
-            imageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor).isActive = true
-            imageView.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.leadingAnchor, constant: BaseSegmentCollectionViewCell.textPadding).isActive = true
-            contentView.trailingAnchor.constraint(greaterThanOrEqualTo: imageView.trailingAnchor, constant: BaseSegmentCollectionViewCell.textPadding).isActive = true
-        }
-    }
-    
-    private class ImageOnTopSegmentCollectionViewCell: BaseSegmentCollectionViewCell, LabelContainerCell, ImageContainerCell {
-        let titleLabel = UILabel()
-        let imageView = UIImageView()
-        
-        override var contentColor:UIColor? {
-            didSet {
-                titleLabel.textColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
-                imageView.tintColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
-            }
-        }
-        
-        override var selectedContentColor:UIColor? {
-            didSet {
-                titleLabel.highlightedTextColor = (selectedContentColor == nil) ? UIColor.black : selectedContentColor!
-            }
-        }
-        
-        override var isHighlighted: Bool {
-            didSet {
-                titleLabel.isHighlighted = isHighlighted
+            override func configure(){
+                super.configure()
+                titleLabel.font = BaseSegmentCollectionViewCell.defaultFont
+                imageView.contentMode = .scaleAspectFit
+                imageView.clipsToBounds = true
                 
-                if isHighlighted {
-                    imageView.tintColor = (selectedContentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : selectedContentColor!
-                } else {
-                    imageView.tintColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
-                }
+                titleLabel.translatesAutoresizingMaskIntoConstraints = false
+                imageView.translatesAutoresizingMaskIntoConstraints = false
+                
+                contentView.addSubview(titleLabel)
+                contentView.addSubview(imageView)
+                
+                imageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
+                titleLabel.centerXAnchor.constraint(equalTo: imageView.centerXAnchor).isActive = true
+                titleLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -BaseSegmentCollectionViewCell.textPadding).isActive = true
+                imageView.bottomAnchor.constraint(equalTo: titleLabel.topAnchor, constant: -BaseSegmentCollectionViewCell.textPadding).isActive = true
+                imageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: BaseSegmentCollectionViewCell.textPadding).isActive = true
             }
         }
         
-        override var isSelected: Bool {
-            didSet {
-                if isSelected {
-                    titleLabel.textColor = (selectedContentColor == nil) ? UIColor.black : selectedContentColor!
-                    imageView.tintColor = (selectedContentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : selectedContentColor!
-                } else {
+        private class ImageOnLeftSegmentCollectionViewCell: BaseSegmentCollectionViewCell {
+            let titleLabel = UILabel()
+            let imageView = UIImageView()
+            
+            override var contentColor:UIColor? {
+                didSet {
                     titleLabel.textColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
                     imageView.tintColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
                 }
             }
-        }
-        
-        override func configure(){
-            super.configure()
-            titleLabel.font = BaseSegmentCollectionViewCell.defaultFont
-            imageView.contentMode = .scaleAspectFit
-            imageView.clipsToBounds = true
             
-            titleLabel.translatesAutoresizingMaskIntoConstraints = false
-            imageView.translatesAutoresizingMaskIntoConstraints = false
-            
-            contentView.addSubview(titleLabel)
-            contentView.addSubview(imageView)
-            
-            imageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
-            titleLabel.centerXAnchor.constraint(equalTo: imageView.centerXAnchor).isActive = true
-            titleLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -BaseSegmentCollectionViewCell.textPadding).isActive = true
-            imageView.bottomAnchor.constraint(equalTo: titleLabel.topAnchor, constant: -BaseSegmentCollectionViewCell.textPadding).isActive = true
-            imageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: BaseSegmentCollectionViewCell.textPadding).isActive = true
-        }
-    }
-    
-    private class ImageOnLeftSegmentCollectionViewCell: BaseSegmentCollectionViewCell, LabelContainerCell, ImageContainerCell {
-        let titleLabel = UILabel()
-        let imageView = UIImageView()
-        
-        override var contentColor:UIColor? {
-            didSet {
-                titleLabel.textColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
-                imageView.tintColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
+            override var selectedContentColor:UIColor? {
+                didSet {
+                    titleLabel.highlightedTextColor = (selectedContentColor == nil) ? UIColor.black : selectedContentColor!
+                }
             }
-        }
-        
-        override var selectedContentColor:UIColor? {
-            didSet {
-                titleLabel.highlightedTextColor = (selectedContentColor == nil) ? UIColor.black : selectedContentColor!
+            
+            override var isHighlighted: Bool {
+                didSet {
+                    titleLabel.isHighlighted = isHighlighted
+                    
+                    if isHighlighted {
+                        imageView.tintColor = (selectedContentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : selectedContentColor!
+                    } else {
+                        imageView.tintColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
+                    }
+                }
             }
-        }
-        
-        override var isHighlighted: Bool {
-            didSet {
-                titleLabel.isHighlighted = isHighlighted
+            
+            override var isSelected: Bool {
+                didSet {
+                    if isSelected {
+                        titleLabel.textColor = (selectedContentColor == nil) ? UIColor.black : selectedContentColor!
+                        imageView.tintColor = (selectedContentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : selectedContentColor!
+                    } else {
+                        titleLabel.textColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
+                        imageView.tintColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
+                    }
+                }
+            }
+            
+            override func configure(){
+                super.configure()
+                titleLabel.font = BaseSegmentCollectionViewCell.defaultFont
+                imageView.contentMode = .scaleAspectFit
+                imageView.clipsToBounds = true
                 
-                if isHighlighted {
-                    imageView.tintColor = (selectedContentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : selectedContentColor!
-                } else {
-                    imageView.tintColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
-                }
+                contentView.addSubview(titleLabel)
+                contentView.addSubview(imageView)
+                
+                titleLabel.translatesAutoresizingMaskIntoConstraints = false
+                imageView.translatesAutoresizingMaskIntoConstraints = false
+                
+                imageView.heightAnchor.constraint(equalToConstant: BaseSegmentCollectionViewCell.imageSize).isActive = true
+                imageView.widthAnchor.constraint(equalToConstant: BaseSegmentCollectionViewCell.imageSize).isActive = true
+                imageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor).isActive = true
+                imageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: BaseSegmentCollectionViewCell.textPadding).isActive = true
+                titleLabel.centerYAnchor.constraint(equalTo: imageView.centerYAnchor).isActive = true
+                titleLabel.leadingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: BaseSegmentCollectionViewCell.textPadding).isActive = true
+                contentView.trailingAnchor.constraint(greaterThanOrEqualTo: titleLabel.trailingAnchor, constant: BaseSegmentCollectionViewCell.textPadding).isActive = true
             }
-        }
-        
-        override var isSelected: Bool {
-            didSet {
-                if isSelected {
-                    titleLabel.textColor = (selectedContentColor == nil) ? UIColor.black : selectedContentColor!
-                    imageView.tintColor = (selectedContentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : selectedContentColor!
-                } else {
-                    titleLabel.textColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
-                    imageView.tintColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
-                }
-            }
-        }
-        
-        override func configure(){
-            super.configure()
-            titleLabel.font = BaseSegmentCollectionViewCell.defaultFont
-            imageView.contentMode = .scaleAspectFit
-            imageView.clipsToBounds = true
-            
-            contentView.addSubview(titleLabel)
-            contentView.addSubview(imageView)
-            
-            titleLabel.translatesAutoresizingMaskIntoConstraints = false
-            imageView.translatesAutoresizingMaskIntoConstraints = false
-            
-            imageView.heightAnchor.constraint(equalToConstant: BaseSegmentCollectionViewCell.imageSize).isActive = true
-            imageView.widthAnchor.constraint(equalToConstant: BaseSegmentCollectionViewCell.imageSize).isActive = true
-            imageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor).isActive = true
-            imageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: BaseSegmentCollectionViewCell.textPadding).isActive = true
-            titleLabel.centerYAnchor.constraint(equalTo: imageView.centerYAnchor).isActive = true
-            titleLabel.leadingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: BaseSegmentCollectionViewCell.textPadding).isActive = true
-            contentView.trailingAnchor.constraint(greaterThanOrEqualTo: titleLabel.trailingAnchor, constant: BaseSegmentCollectionViewCell.textPadding).isActive = true
         }
     }
-}
-
-fileprivate protocol LabelContainerCell {
-    var titleLabel:UILabel { get }
-}
-
-fileprivate protocol ImageContainerCell {
-    var imageView:UIImageView { get }
 }
