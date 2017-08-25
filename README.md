@@ -39,7 +39,7 @@ override func viewDidLoad() {
 
     segmentedControl.segmentStyle = .textOnly
     segmentedControl.insertSegment(withTitle: "Segment 1", image: #imageLiteral(resourceName: "segment-1"), at: 0)
-	segmentedControl.insertSegment(withTitle: "Segment 2", image: #imageLiteral(resourceName: "segment-2"), at: 1)
+    segmentedControl.insertSegment(withTitle: "Segment 2", image: #imageLiteral(resourceName: "segment-2"), at: 1)
     segmentedControl.insertSegment(withTitle: "Segment 3", image: #imageLiteral(resourceName: "segment-3"), at: 2)
     segmentedControl.insertSegment(withTitle: "Segment 4", image: #imageLiteral(resourceName: "segment-4"), at: 3)
     segmentedControl.insertSegment(withTitle: "Segment 5", image: #imageLiteral(resourceName: "segment-5"), at: 4)
@@ -82,7 +82,7 @@ See the Demo project for example on how to use it.
 The easiest way of installing ScrollableSegmentedControl is via [CocoaPods](http://cocoapods.org/). 
 
 ```
-pod 'ScrollableSegmentedControl', '~> 1.1.0'
+pod 'ScrollableSegmentedControl', '~> 1.2.0'
 ```
 
 ### Old-fashioned way
