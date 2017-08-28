@@ -41,7 +41,7 @@ public class ScrollableSegmentedControl: UIControl {
                 
                 setNeedsLayout()
                 flowLayout.invalidateLayout()
-                collectionView?.reloadData()
+                reloadSegments()
                 
                 if indexPath != nil {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.05, execute: {
@@ -56,7 +56,7 @@ public class ScrollableSegmentedControl: UIControl {
     override public var tintColor: UIColor! {
         didSet {
             collectionView?.tintColor = tintColor
-            collectionView?.reloadData()
+            reloadSegments()
         }
     }
     
@@ -65,7 +65,7 @@ public class ScrollableSegmentedControl: UIControl {
         get { return _segmentContentColor }
         set {
             _segmentContentColor = newValue
-            collectionView?.reloadData()
+            reloadSegments()
         }
     }
     
@@ -74,7 +74,7 @@ public class ScrollableSegmentedControl: UIControl {
         get { return _selectedSegmentContentColor }
         set {
             _selectedSegmentContentColor = newValue
-            collectionView?.reloadData()
+            reloadSegments()
         }
     }
     
@@ -109,7 +109,7 @@ public class ScrollableSegmentedControl: UIControl {
         }
         
         flowLayout.invalidateLayout()
-        collectionView?.reloadData()
+        reloadSegments()
     }
     
     private func configureAttributedTitlesForSegment(_ segment:SegmentData) {
@@ -163,7 +163,7 @@ public class ScrollableSegmentedControl: UIControl {
         configureAttributedTitlesForSegment(segment)
         segmentsData.insert(segment, at: index)
         calculateLongestTextWidth(text: title)
-        collectionView?.reloadData()
+        reloadSegments()
     }
     
     /**
@@ -173,7 +173,7 @@ public class ScrollableSegmentedControl: UIControl {
         let segment = SegmentData()
         segment.image = image.withRenderingMode(.alwaysTemplate)
         segmentsData.insert(segment, at: index)
-        collectionView?.reloadData()
+        reloadSegments()
     }
     
     
@@ -189,7 +189,7 @@ public class ScrollableSegmentedControl: UIControl {
         if let str = title {
             calculateLongestTextWidth(text: str)
         }
-        collectionView?.reloadData()
+        reloadSegments()
     }
     
     /**
@@ -197,7 +197,7 @@ public class ScrollableSegmentedControl: UIControl {
      */
     public func removeSegment(at segment: Int){
         segmentsData.remove(at: segment)
-        collectionView?.reloadData()
+        reloadSegments()
     }
     
     /**
@@ -264,21 +264,12 @@ public class ScrollableSegmentedControl: UIControl {
         
         flowLayout.invalidateLayout()
         
-        let tempTabIndex:Int
-        if let indexPath = collectionView?.indexPathsForSelectedItems?.first {
-            tempTabIndex = indexPath.item
-        } else {
-            tempTabIndex = -1
-        }
-        
-        collectionView?.reloadData()
-        
-        self.selectedSegmentIndex = tempTabIndex
+        reloadSegments()
     }
     
     // MARK: - Private
     
-    private func configure() {
+    fileprivate func configure() {
         clipsToBounds = true
         
         flowLayout.scrollDirection = .horizontal
@@ -297,7 +288,7 @@ public class ScrollableSegmentedControl: UIControl {
         addSubview(collectionView!)
     }
     
-    private func configureSegmentSize() {
+    fileprivate func configureSegmentSize() {
         let width:CGFloat
         
         switch segmentStyle {
@@ -316,7 +307,7 @@ public class ScrollableSegmentedControl: UIControl {
         flowLayout.itemSize = itemSize
     }
     
-    private func calculateLongestTextWidth(text:String) {
+    fileprivate func calculateLongestTextWidth(text:String) {
         let fontAttributes:[String:Any]
         if normalAttributes != nil {
             fontAttributes = normalAttributes!
@@ -348,6 +339,16 @@ public class ScrollableSegmentedControl: UIControl {
         }
         
         return segmentData
+    }
+    
+    fileprivate func reloadSegments() {
+        if let collectionView_ = collectionView {
+            collectionView_.reloadData()
+            if selectedSegmentIndex >= 0 {
+                let indexPath = IndexPath(item: selectedSegmentIndex, section: 0)
+                collectionView_.selectItem(at: indexPath, animated: true, scrollPosition: .left)
+            }
+        }
     }
     
     /*
