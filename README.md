@@ -94,7 +94,7 @@ See the Demo project for example on how to use it.
 The easiest way of installing ScrollableSegmentedControl is via [CocoaPods](http://cocoapods.org/). 
 
 ```
-pod 'ScrollableSegmentedControl', '~> 1.2.0'
+pod 'ScrollableSegmentedControl', '~> 1.2.1'
 ```
 
 ### Old-fashioned way
