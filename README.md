@@ -73,6 +73,18 @@ func application(_ application: UIApplication, didFinishLaunchingWithOptions lau
 }
 ```
 
+Configuring custom title attributes via setTitleTextAttributes method
+
+```swift
+let largerRedTextAttributes = [NSFontAttributeName: UIFont.systemFont(ofSize: 16), NSForegroundColorAttributeName: UIColor.red]
+let largerRedTextHighlightAttributes = [NSFontAttributeName: UIFont.systemFont(ofSize: 16), NSForegroundColorAttributeName: UIColor.blue]
+let largerRedTextSelectAttributes = [NSFontAttributeName: UIFont.systemFont(ofSize: 16), NSForegroundColorAttributeName: UIColor.orange]
+
+segmentedControl.setTitleTextAttributes(largerRedTextAttributes, for: .normal)
+segmentedControl.setTitleTextAttributes(largerRedTextHighlightAttributes, for: .highlighted)
+segmentedControl.setTitleTextAttributes(largerRedTextSelectAttributes, for: .selected)
+```
+
 See the Demo project for example on how to use it. 
 
 
