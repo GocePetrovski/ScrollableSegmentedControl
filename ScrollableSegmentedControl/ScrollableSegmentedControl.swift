@@ -61,7 +61,7 @@ public class ScrollableSegmentedControl: UIControl {
     }
     
     fileprivate var _segmentContentColor:UIColor?
-    public dynamic var segmentContentColor:UIColor? {
+    @objc public dynamic var segmentContentColor:UIColor? {
         get { return _segmentContentColor }
         set {
             _segmentContentColor = newValue
@@ -70,7 +70,7 @@ public class ScrollableSegmentedControl: UIControl {
     }
     
     fileprivate var _selectedSegmentContentColor:UIColor?
-    public dynamic var selectedSegmentContentColor:UIColor? {
+    @objc public dynamic var selectedSegmentContentColor:UIColor? {
         get { return _selectedSegmentContentColor }
         set {
             _selectedSegmentContentColor = newValue
@@ -89,11 +89,11 @@ public class ScrollableSegmentedControl: UIControl {
         configure()
     }
     
-    fileprivate var normalAttributes:[String : Any]?
-    fileprivate var highlightedAttributes:[String : Any]?
-    fileprivate var selectedAttributes:[String : Any]?
-    fileprivate var _titleAttributes:[UInt: [String : Any]] = [UInt: [String : Any]]()
-    public func setTitleTextAttributes(_ attributes: [String : Any]?, for state: UIControlState) {
+    fileprivate var normalAttributes:[NSAttributedStringKey : Any]?
+    fileprivate var highlightedAttributes:[NSAttributedStringKey : Any]?
+    fileprivate var selectedAttributes:[NSAttributedStringKey : Any]?
+    fileprivate var _titleAttributes:[UInt: [NSAttributedStringKey : Any]] = [UInt: [NSAttributedStringKey : Any]]()
+    public func setTitleTextAttributes(_ attributes: [NSAttributedStringKey : Any]?, for state: UIControlState) {
         _titleAttributes[state.rawValue] = attributes
         
         normalAttributes = _titleAttributes[UIControlState.normal.rawValue]
@@ -148,7 +148,7 @@ public class ScrollableSegmentedControl: UIControl {
         }
     }
     
-    public func titleTextAttributes(for state: UIControlState) -> [String : Any]? {
+    public func titleTextAttributes(for state: UIControlState) -> [NSAttributedStringKey : Any]? {
         return _titleAttributes[state.rawValue]
     }
     
@@ -308,7 +308,7 @@ public class ScrollableSegmentedControl: UIControl {
     }
     
     fileprivate func calculateLongestTextWidth(text:String) {
-        let fontAttributes:[String:Any]
+        let fontAttributes:[NSAttributedStringKey:Any]
         if normalAttributes != nil {
             fontAttributes = normalAttributes!
         } else  if highlightedAttributes != nil {
@@ -316,10 +316,10 @@ public class ScrollableSegmentedControl: UIControl {
         } else if selectedAttributes != nil {
             fontAttributes = selectedAttributes!
         } else {
-            fontAttributes =  [NSFontAttributeName: BaseSegmentCollectionViewCell.defaultFont]
+            fontAttributes =  [NSAttributedStringKey.font: BaseSegmentCollectionViewCell.defaultFont]
         }
         
-        let size = (text as NSString).size(attributes: fontAttributes)
+        let size = (text as NSString).size(withAttributes: fontAttributes)
         let newLongestTextWidth = 2.0 + size.width + BaseSegmentCollectionViewCell.textPadding * 2
         if newLongestTextWidth > longestTextWidth {
             longestTextWidth = newLongestTextWidth
