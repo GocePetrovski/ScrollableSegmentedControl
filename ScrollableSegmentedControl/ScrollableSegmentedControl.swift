@@ -551,7 +551,7 @@ public class ScrollableSegmentedControl: UIControl {
     
     private class TextOnlySegmentCollectionViewCell: BaseSegmentCollectionViewCell {
         let titleLabel = UILabel()
-
+        
         override var contentColor:UIColor? {
             didSet {
                 titleLabel.textColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
