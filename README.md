@@ -20,10 +20,10 @@ ScrollableSegmentedControl supports 4 styles of segments: text only, image only,
 
 
 
-##Support
+### Support
 
-- Xcode 8.1+
-- Swift 3.0+
+- Xcode 9.0+
+- Swift 4.0+
 - iOS 9.0+
 
 
@@ -94,7 +94,7 @@ See the Demo project for example on how to use it.
 The easiest way of installing ScrollableSegmentedControl is via [CocoaPods](http://cocoapods.org/). 
 
 ```
-pod 'ScrollableSegmentedControl', '~> 1.2.1'
+pod 'ScrollableSegmentedControl', '~> 1.3.0'
 ```
 
 ### Old-fashioned way
