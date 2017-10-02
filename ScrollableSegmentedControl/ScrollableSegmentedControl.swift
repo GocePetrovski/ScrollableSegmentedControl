@@ -16,7 +16,7 @@ public enum ScrollableSegmentedControlSegmentStyle {
  A ScrollableSegmentedControl object is horizontaly scrollable control made of multiple segments, each segment functioning as discrete button.
  */
 @IBDesignable
-public class ScrollableSegmentedControl: UIControl {
+@objc public class ScrollableSegmentedControl: UIControl {
     fileprivate let flowLayout = UICollectionViewFlowLayout()
     fileprivate var collectionView:UICollectionView?
     private var collectionViewController:CollectionViewController?
@@ -93,7 +93,7 @@ public class ScrollableSegmentedControl: UIControl {
     fileprivate var highlightedAttributes:[NSAttributedStringKey : Any]?
     fileprivate var selectedAttributes:[NSAttributedStringKey : Any]?
     fileprivate var _titleAttributes:[UInt: [NSAttributedStringKey : Any]] = [UInt: [NSAttributedStringKey : Any]]()
-    public func setTitleTextAttributes(_ attributes: [NSAttributedStringKey : Any]?, for state: UIControlState) {
+    @objc public func setTitleTextAttributes(_ attributes: [NSAttributedStringKey : Any]?, for state: UIControlState) {
         _titleAttributes[state.rawValue] = attributes
         
         normalAttributes = _titleAttributes[UIControlState.normal.rawValue]
@@ -148,7 +148,7 @@ public class ScrollableSegmentedControl: UIControl {
         }
     }
     
-    public func titleTextAttributes(for state: UIControlState) -> [NSAttributedStringKey : Any]? {
+    @objc public func titleTextAttributes(for state: UIControlState) -> [NSAttributedStringKey : Any]? {
         return _titleAttributes[state.rawValue]
     }
     
@@ -157,7 +157,7 @@ public class ScrollableSegmentedControl: UIControl {
     /**
      Inserts a segment at a specific position in the receiver and gives it a title as content.
      */
-    public func insertSegment(withTitle title: String, at index: Int) {
+    @objc public func insertSegment(withTitle title: String, at index: Int) {
         let segment = SegmentData()
         segment.title = title
         configureAttributedTitlesForSegment(segment)
@@ -169,7 +169,7 @@ public class ScrollableSegmentedControl: UIControl {
     /**
      Inserts a segment at a specified position in the receiver and gives it an image as content.
      */
-    public func insertSegment(with image: UIImage, at index: Int) {
+    @objc public func insertSegment(with image: UIImage, at index: Int) {
         let segment = SegmentData()
         segment.image = image.withRenderingMode(.alwaysTemplate)
         segmentsData.insert(segment, at: index)
@@ -180,7 +180,7 @@ public class ScrollableSegmentedControl: UIControl {
     /**
      Inserts a segment at a specific position in the receiver and gives it a title as content and/or image as content.
      */
-    public func insertSegment(withTitle title: String?, image: UIImage?, at index: Int) {
+    @objc public func insertSegment(withTitle title: String?, image: UIImage?, at index: Int) {
         let segment = SegmentData()
         segment.title = title
         segment.image = image?.withRenderingMode(.alwaysTemplate)
@@ -195,7 +195,7 @@ public class ScrollableSegmentedControl: UIControl {
     /**
      Removes segment at a specific position from the receiver.
      */
-    public func removeSegment(at segment: Int){
+    @objc public func removeSegment(at segment: Int){
         segmentsData.remove(at: segment)
         reloadSegments()
     }
@@ -203,12 +203,12 @@ public class ScrollableSegmentedControl: UIControl {
     /**
      Returns the number of segments the receiver has.
      */
-    public var numberOfSegments: Int { return segmentsData.count }
+    @objc public var numberOfSegments: Int { return segmentsData.count }
     
     /**
      Returns the title of the specified segment.
      */
-    func titleForSegment(at segment: Int) -> String? {
+    @objc public func titleForSegment(at segment: Int) -> String? {
         if segmentsData.count == 0 {
             return nil
         }
@@ -222,7 +222,7 @@ public class ScrollableSegmentedControl: UIControl {
      
      Set this property to -1 to turn off the current selection.
      */
-    public var selectedSegmentIndex: Int = -1 {
+    @objc public var selectedSegmentIndex: Int = -1 {
         didSet{
             if selectedSegmentIndex < -1 {
                 selectedSegmentIndex = -1
@@ -249,7 +249,7 @@ public class ScrollableSegmentedControl: UIControl {
      Configure if the selected segment should have underline. Default value is false.
      */
     @IBInspectable
-    public var underlineSelected:Bool = false
+    @objc public var underlineSelected:Bool = false
     
     // MARK: - Layout management
     
