@@ -20,10 +20,10 @@ ScrollableSegmentedControl supports 4 styles of segments: text only, image only,
 
 
 
-##Support
+### Support
 
-- Xcode 8.1+
-- Swift 3.0+
+- Xcode 9.0+
+- Swift 4.0+
 - iOS 9.0+
 
 
@@ -76,9 +76,9 @@ func application(_ application: UIApplication, didFinishLaunchingWithOptions lau
 Configuring custom title attributes via setTitleTextAttributes method
 
 ```swift
-let largerRedTextAttributes = [NSFontAttributeName: UIFont.systemFont(ofSize: 16), NSForegroundColorAttributeName: UIColor.red]
-let largerRedTextHighlightAttributes = [NSFontAttributeName: UIFont.systemFont(ofSize: 16), NSForegroundColorAttributeName: UIColor.blue]
-let largerRedTextSelectAttributes = [NSFontAttributeName: UIFont.systemFont(ofSize: 16), NSForegroundColorAttributeName: UIColor.orange]
+let largerRedTextAttributes = [NSAttributedStringKey.font: UIFont.systemFont(ofSize: 16), NSAttributedStringKey.foregroundColor: UIColor.red]
+let largerRedTextHighlightAttributes = [NSAttributedStringKey.font: UIFont.systemFont(ofSize: 16), NSAttributedStringKey.foregroundColor: UIColor.blue]
+let largerRedTextSelectAttributes = [NSAttributedStringKey.font: UIFont.systemFont(ofSize: 16), NSAttributedStringKey.foregroundColor: UIColor.orange]
 
 segmentedControl.setTitleTextAttributes(largerRedTextAttributes, for: .normal)
 segmentedControl.setTitleTextAttributes(largerRedTextHighlightAttributes, for: .highlighted)
@@ -94,7 +94,7 @@ See the Demo project for example on how to use it.
 The easiest way of installing ScrollableSegmentedControl is via [CocoaPods](http://cocoapods.org/). 
 
 ```
-pod 'ScrollableSegmentedControl', '~> 1.2.1'
+pod 'ScrollableSegmentedControl', '~> 1.3.0'
 ```
 
 ### Old-fashioned way

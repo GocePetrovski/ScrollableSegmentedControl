@@ -8,7 +8,8 @@
 
 import UIKit
 
-public enum ScrollableSegmentedControlSegmentStyle {
+@objc
+public enum ScrollableSegmentedControlSegmentStyle: Int {
     case textOnly, imageOnly, imageOnTop, imageOnLeft
 }
 
@@ -16,14 +17,14 @@ public enum ScrollableSegmentedControlSegmentStyle {
  A ScrollableSegmentedControl object is horizontaly scrollable control made of multiple segments, each segment functioning as discrete button.
  */
 @IBDesignable
-public class ScrollableSegmentedControl: UIControl {
+@objc public class ScrollableSegmentedControl: UIControl {
     fileprivate let flowLayout = UICollectionViewFlowLayout()
     fileprivate var collectionView:UICollectionView?
     private var collectionViewController:CollectionViewController?
     private var segmentsData = [SegmentData]()
     private var longestTextWidth:CGFloat = 10
     
-    public var segmentStyle:ScrollableSegmentedControlSegmentStyle = .textOnly {
+    @objc public var segmentStyle:ScrollableSegmentedControlSegmentStyle = .textOnly {
         didSet {
             if oldValue != segmentStyle {
                 switch segmentStyle {
@@ -61,7 +62,7 @@ public class ScrollableSegmentedControl: UIControl {
     }
     
     fileprivate var _segmentContentColor:UIColor?
-    public dynamic var segmentContentColor:UIColor? {
+    @objc public dynamic var segmentContentColor:UIColor? {
         get { return _segmentContentColor }
         set {
             _segmentContentColor = newValue
@@ -70,7 +71,7 @@ public class ScrollableSegmentedControl: UIControl {
     }
     
     fileprivate var _selectedSegmentContentColor:UIColor?
-    public dynamic var selectedSegmentContentColor:UIColor? {
+    @objc public dynamic var selectedSegmentContentColor:UIColor? {
         get { return _selectedSegmentContentColor }
         set {
             _selectedSegmentContentColor = newValue
@@ -89,11 +90,11 @@ public class ScrollableSegmentedControl: UIControl {
         configure()
     }
     
-    fileprivate var normalAttributes:[String : Any]?
-    fileprivate var highlightedAttributes:[String : Any]?
-    fileprivate var selectedAttributes:[String : Any]?
-    fileprivate var _titleAttributes:[UInt: [String : Any]] = [UInt: [String : Any]]()
-    public func setTitleTextAttributes(_ attributes: [String : Any]?, for state: UIControlState) {
+    fileprivate var normalAttributes:[NSAttributedStringKey : Any]?
+    fileprivate var highlightedAttributes:[NSAttributedStringKey : Any]?
+    fileprivate var selectedAttributes:[NSAttributedStringKey : Any]?
+    fileprivate var _titleAttributes:[UInt: [NSAttributedStringKey : Any]] = [UInt: [NSAttributedStringKey : Any]]()
+    @objc public func setTitleTextAttributes(_ attributes: [NSAttributedStringKey : Any]?, for state: UIControlState) {
         _titleAttributes[state.rawValue] = attributes
         
         normalAttributes = _titleAttributes[UIControlState.normal.rawValue]
@@ -148,7 +149,7 @@ public class ScrollableSegmentedControl: UIControl {
         }
     }
     
-    public func titleTextAttributes(for state: UIControlState) -> [String : Any]? {
+    @objc public func titleTextAttributes(for state: UIControlState) -> [NSAttributedStringKey : Any]? {
         return _titleAttributes[state.rawValue]
     }
     
@@ -157,7 +158,7 @@ public class ScrollableSegmentedControl: UIControl {
     /**
      Inserts a segment at a specific position in the receiver and gives it a title as content.
      */
-    public func insertSegment(withTitle title: String, at index: Int) {
+    @objc public func insertSegment(withTitle title: String, at index: Int) {
         let segment = SegmentData()
         segment.title = title
         configureAttributedTitlesForSegment(segment)
@@ -169,7 +170,7 @@ public class ScrollableSegmentedControl: UIControl {
     /**
      Inserts a segment at a specified position in the receiver and gives it an image as content.
      */
-    public func insertSegment(with image: UIImage, at index: Int) {
+    @objc public func insertSegment(with image: UIImage, at index: Int) {
         let segment = SegmentData()
         segment.image = image.withRenderingMode(.alwaysTemplate)
         segmentsData.insert(segment, at: index)
@@ -180,7 +181,7 @@ public class ScrollableSegmentedControl: UIControl {
     /**
      Inserts a segment at a specific position in the receiver and gives it a title as content and/or image as content.
      */
-    public func insertSegment(withTitle title: String?, image: UIImage?, at index: Int) {
+    @objc public func insertSegment(withTitle title: String?, image: UIImage?, at index: Int) {
         let segment = SegmentData()
         segment.title = title
         segment.image = image?.withRenderingMode(.alwaysTemplate)
@@ -195,7 +196,7 @@ public class ScrollableSegmentedControl: UIControl {
     /**
      Removes segment at a specific position from the receiver.
      */
-    public func removeSegment(at segment: Int){
+    @objc public func removeSegment(at segment: Int){
         segmentsData.remove(at: segment)
         reloadSegments()
     }
@@ -203,12 +204,12 @@ public class ScrollableSegmentedControl: UIControl {
     /**
      Returns the number of segments the receiver has.
      */
-    public var numberOfSegments: Int { return segmentsData.count }
+    @objc public var numberOfSegments: Int { return segmentsData.count }
     
     /**
      Returns the title of the specified segment.
      */
-    func titleForSegment(at segment: Int) -> String? {
+    @objc public func titleForSegment(at segment: Int) -> String? {
         if segmentsData.count == 0 {
             return nil
         }
@@ -222,7 +223,7 @@ public class ScrollableSegmentedControl: UIControl {
      
      Set this property to -1 to turn off the current selection.
      */
-    public var selectedSegmentIndex: Int = -1 {
+    @objc public var selectedSegmentIndex: Int = -1 {
         didSet{
             if selectedSegmentIndex < -1 {
                 selectedSegmentIndex = -1
@@ -249,7 +250,7 @@ public class ScrollableSegmentedControl: UIControl {
      Configure if the selected segment should have underline. Default value is false.
      */
     @IBInspectable
-    public var underlineSelected:Bool = false
+    @objc public var underlineSelected:Bool = false
     
     // MARK: - Layout management
     
@@ -308,7 +309,7 @@ public class ScrollableSegmentedControl: UIControl {
     }
     
     fileprivate func calculateLongestTextWidth(text:String) {
-        let fontAttributes:[String:Any]
+        let fontAttributes:[NSAttributedStringKey:Any]
         if normalAttributes != nil {
             fontAttributes = normalAttributes!
         } else  if highlightedAttributes != nil {
@@ -316,10 +317,10 @@ public class ScrollableSegmentedControl: UIControl {
         } else if selectedAttributes != nil {
             fontAttributes = selectedAttributes!
         } else {
-            fontAttributes =  [NSFontAttributeName: BaseSegmentCollectionViewCell.defaultFont]
+            fontAttributes =  [NSAttributedStringKey.font: BaseSegmentCollectionViewCell.defaultFont]
         }
         
-        let size = (text as NSString).size(attributes: fontAttributes)
+        let size = (text as NSString).size(withAttributes: fontAttributes)
         let newLongestTextWidth = 2.0 + size.width + BaseSegmentCollectionViewCell.textPadding * 2
         if newLongestTextWidth > longestTextWidth {
             longestTextWidth = newLongestTextWidth
@@ -551,7 +552,7 @@ public class ScrollableSegmentedControl: UIControl {
     
     private class TextOnlySegmentCollectionViewCell: BaseSegmentCollectionViewCell {
         let titleLabel = UILabel()
-
+        
         override var contentColor:UIColor? {
             didSet {
                 titleLabel.textColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
