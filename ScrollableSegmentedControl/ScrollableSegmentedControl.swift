@@ -8,7 +8,8 @@
 
 import UIKit
 
-public enum ScrollableSegmentedControlSegmentStyle {
+@objc
+public enum ScrollableSegmentedControlSegmentStyle: Int {
     case textOnly, imageOnly, imageOnTop, imageOnLeft
 }
 
@@ -23,7 +24,7 @@ public enum ScrollableSegmentedControlSegmentStyle {
     private var segmentsData = [SegmentData]()
     private var longestTextWidth:CGFloat = 10
     
-    public var segmentStyle:ScrollableSegmentedControlSegmentStyle = .textOnly {
+    @objc public var segmentStyle:ScrollableSegmentedControlSegmentStyle = .textOnly {
         didSet {
             if oldValue != segmentStyle {
                 switch segmentStyle {
