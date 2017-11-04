@@ -252,6 +252,12 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
     @IBInspectable
     @objc public var underlineSelected:Bool = false
     
+    /**
+     Configure height of undeline view.
+     */
+    @IBInspectable
+    @objc public var underlineHeight:CGFloat = 3.0
+    
     // MARK: - Layout management
     
     override public func layoutSubviews() {
@@ -421,6 +427,7 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
                 segmentCell = cell
             }
             
+            segmentCell.underlineHeight = segmentedControl.underlineHeight
             segmentCell.showUnderline = segmentedControl.underlineSelected
             if segmentedControl.underlineSelected {
                 segmentCell.tintColor = segmentedControl.tintColor
@@ -481,6 +488,8 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
         static let defaultFont = UIFont.systemFont(ofSize: 14)
         static let defaultTextColor = UIColor.darkGray
         
+        var underlineHeight: CGFloat = 3.0
+        
         var underlineView:UIView?
         public var contentColor:UIColor?
         public var selectedContentColor:UIColor?
@@ -530,7 +539,7 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
         private func configureConstraints() {
             if let underline = underlineView {
                 underline.translatesAutoresizingMaskIntoConstraints = false
-                underline.heightAnchor.constraint(equalToConstant: 3.0).isActive = true
+                underline.heightAnchor.constraint(equalToConstant: underlineHeight).isActive = true
                 underline.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
                 underline.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
                 underline.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
