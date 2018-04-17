@@ -24,6 +24,21 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
     private var segmentsData = [SegmentData]()
     private var longestTextWidth:CGFloat = 10
     
+    public var fixedWidth: Bool = true {
+        didSet {
+            if oldValue != fixedWidth {
+                
+                collectionViewController?.fixedWidth = fixedWidth
+                collectionViewController?.flowLayout = flowLayout
+                
+                setNeedsLayout()
+                flowLayout.invalidateLayout()
+                reloadSegments()
+                
+            }
+        }
+    }
+    
     @objc public var segmentStyle:ScrollableSegmentedControlSegmentStyle = .textOnly {
         didSet {
             if oldValue != segmentStyle {
@@ -282,6 +297,8 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
         collectionView!.tintColor = tintColor
         collectionView!.register(TextOnlySegmentCollectionViewCell.self, forCellWithReuseIdentifier: CollectionViewController.textOnlyCellIdentifier)
         collectionViewController = CollectionViewController(segmentedControl: self)
+        collectionViewController?.fixedWidth = fixedWidth
+        collectionViewController?.flowLayout = flowLayout
         collectionView!.dataSource = collectionViewController
         collectionView!.delegate = collectionViewController
         collectionView!.backgroundColor = UIColor.clear
@@ -378,6 +395,8 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
         static let imageOnLeftCellIdentifier = "imageOnLeftCellIdentifier"
         
         private weak var segmentedControl: ScrollableSegmentedControl!
+        var fixedWidth = true
+        var flowLayout: UICollectionViewFlowLayout?
         
         init(segmentedControl:ScrollableSegmentedControl) {
             self.segmentedControl = segmentedControl
@@ -468,6 +487,23 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
                     }
                 }
             }
+        }
+        
+        func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+            if fixedWidth {
+                return (flowLayout?.itemSize)!
+            }
+            
+            let data = segmentedControl.segmentsData[indexPath.item]
+            let width = calculateTextWidth(text: data.title!)
+            return  CGSize(width: width, height: (flowLayout?.itemSize.height)!)
+        }
+        
+        fileprivate func calculateTextWidth(text:String) -> CGFloat {
+            
+            let size = (text as NSString).size(withAttributes: [NSAttributedStringKey.font: BaseSegmentCollectionViewCell.defaultFont])
+            let textWidth = 2.0 + size.width + BaseSegmentCollectionViewCell.textPadding * 2
+            return textWidth
         }
     }
     
