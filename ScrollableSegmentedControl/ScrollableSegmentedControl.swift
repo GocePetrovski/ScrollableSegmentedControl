@@ -493,14 +493,18 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
             if fixedWidth {
                 return (flowLayout?.itemSize)!
             }
-            
+            if segmentedControl.segmentStyle == .imageOnly {
+                return CGSize(width: BaseSegmentCollectionViewCell.imageSize + BaseSegmentCollectionViewCell.textPadding * 2, height: BaseSegmentCollectionViewCell.imageSize + BaseSegmentCollectionViewCell.textPadding * 2)
+            }
             let data = segmentedControl.segmentsData[indexPath.item]
-            let width = calculateTextWidth(text: data.title!)
+            var width = calculateTextWidth(text: data.title!)
+            if segmentedControl.segmentStyle == .imageOnLeft {
+                width = width + BaseSegmentCollectionViewCell.textPadding + BaseSegmentCollectionViewCell.imageSize
+            }
             return  CGSize(width: width, height: (flowLayout?.itemSize.height)!)
         }
         
-        fileprivate func calculateTextWidth(text:String) -> CGFloat {
-            
+        fileprivate func calculateTextWidth(text: String) -> CGFloat {
             let size = (text as NSString).size(withAttributes: [NSAttributedStringKey.font: BaseSegmentCollectionViewCell.defaultFont])
             let textWidth = 2.0 + size.width + BaseSegmentCollectionViewCell.textPadding * 2
             return textWidth
@@ -765,8 +769,8 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
         
         override var contentColor:UIColor? {
             didSet {
-                titleLabel.textColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
-                imageView.tintColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
+                titleLabel.textColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor: contentColor!
+                imageView.tintColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor: contentColor!
             }
         }
         
