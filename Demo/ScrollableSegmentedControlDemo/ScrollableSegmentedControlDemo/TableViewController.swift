@@ -29,14 +29,15 @@ class TableViewController: UITableViewController {
 
         segmentedControl.segmentStyle = .textOnly
         segmentedControl.insertSegment(withTitle: "Segment 1", image: #imageLiteral(resourceName: "segment-1"), at: 0)
-        segmentedControl.insertSegment(withTitle: "Segment 2", image: #imageLiteral(resourceName: "segment-2"), at: 1)
+        segmentedControl.insertSegment(withTitle: "S 2", image: #imageLiteral(resourceName: "segment-2"), at: 1)
         segmentedControl.insertSegment(withTitle: "Segment 3", image: #imageLiteral(resourceName: "segment-3"), at: 2)
-        segmentedControl.insertSegment(withTitle: "Segment 4", image: #imageLiteral(resourceName: "segment-4"), at: 3)
+        segmentedControl.insertSegment(withTitle: "Seg 4", image: #imageLiteral(resourceName: "segment-4"), at: 3)
         segmentedControl.insertSegment(withTitle: "Segment 5", image: #imageLiteral(resourceName: "segment-5"), at: 4)
         segmentedControl.insertSegment(withTitle: "Segment 6", image: #imageLiteral(resourceName: "segment-6"), at: 5)
         
         segmentedControl.underlineSelected = true
         segmentedControl.selectedSegmentIndex = 0
+        segmentedControl.autoSizeSegmentWidth = true
         
         segmentedControl.addTarget(self, action: #selector(TableViewController.segmentSelected(sender:)), for: .valueChanged)
     }

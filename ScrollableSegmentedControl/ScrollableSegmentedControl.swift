@@ -24,6 +24,23 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
     private var segmentsData = [SegmentData]()
     private var longestTextWidth:CGFloat = 10
     
+    /**
+     A Boolean value that determines if the width of all segments is going to be same or automatically sized.
+     
+     When this value is set to false all segments have the same width which equivalent of the width required to display the text that requires the longest width to be drawn.
+     The default value is false.
+     */
+    public var autoSizeSegmentWidth: Bool = false {
+        didSet {
+            if oldValue != autoSizeSegmentWidth {
+                setNeedsLayout()
+                flowLayout.invalidateLayout()
+                reloadSegments()
+            }
+        }
+    }
+    
+    
     @objc public var segmentStyle:ScrollableSegmentedControlSegmentStyle = .textOnly {
         didSet {
             if oldValue != segmentStyle {
@@ -292,20 +309,23 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
     fileprivate func configureSegmentSize() {
         let width:CGFloat
         
-        switch segmentStyle {
-        case .imageOnLeft:
-            width = longestTextWidth + BaseSegmentCollectionViewCell.imageSize + BaseSegmentCollectionViewCell.imageToTextMargin * 2
-        default:
-            if collectionView!.frame.size.width > longestTextWidth * CGFloat(segmentsData.count) {
-                width = collectionView!.frame.size.width / CGFloat(segmentsData.count)
-            } else {
-                width = longestTextWidth
+        if autoSizeSegmentWidth == false {
+            switch segmentStyle {
+            case .imageOnLeft:
+                width = longestTextWidth + BaseSegmentCollectionViewCell.imageSize + BaseSegmentCollectionViewCell.imageToTextMargin * 2
+            default:
+                if collectionView!.frame.size.width > longestTextWidth * CGFloat(segmentsData.count) {
+                    width = collectionView!.frame.size.width / CGFloat(segmentsData.count)
+                } else {
+                    width = longestTextWidth
+                }
             }
+            
+            flowLayout.itemSize = CGSize(width: 10.0, height: frame.size.height)
+        } else {
+            width = 10.0
+            flowLayout.estimatedItemSize = CGSize(width: width, height: frame.size.height)
         }
-        
-        
-        let itemSize = CGSize(width: width, height: frame.size.height)
-        flowLayout.itemSize = itemSize
     }
     
     fileprivate func calculateLongestTextWidth(text:String) {
