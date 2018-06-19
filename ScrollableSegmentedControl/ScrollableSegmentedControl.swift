@@ -25,14 +25,14 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
     private var longestTextWidth:CGFloat = 10
     
     /**
-     A Boolean value that determines if the width of all segments is going to be same or automatically sized.
+     A Boolean value that determines if the width of all segments is going to be fixed or not.
      
-     When this value is set to false all segments have the same width which equivalent of the width required to display the text that requires the longest width to be drawn.
-     The default value is false.
+     When this value is set to true all segments have the same width which equivalent of the width required to display the text that requires the longest width to be drawn.
+     The default value is true.
      */
-    public var autoSizeSegmentWidth: Bool = false {
+    public var fixedSegmentWidth: Bool = true {
         didSet {
-            if oldValue != autoSizeSegmentWidth {
+            if oldValue != fixedSegmentWidth {
                 setNeedsLayout()
                 flowLayout.invalidateLayout()
                 reloadSegments()
@@ -309,7 +309,7 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
     fileprivate func configureSegmentSize() {
         let width:CGFloat
         
-        if autoSizeSegmentWidth == false {
+        if fixedSegmentWidth == true {
             switch segmentStyle {
             case .imageOnLeft:
                 width = longestTextWidth + BaseSegmentCollectionViewCell.imageSize + BaseSegmentCollectionViewCell.imageToTextMargin * 2

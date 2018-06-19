@@ -37,7 +37,7 @@ class TableViewController: UITableViewController {
         
         segmentedControl.underlineSelected = true
         segmentedControl.selectedSegmentIndex = 0
-        segmentedControl.autoSizeSegmentWidth = true
+        segmentedControl.fixedSegmentWidth = false
         
         segmentedControl.addTarget(self, action: #selector(TableViewController.segmentSelected(sender:)), for: .valueChanged)
     }
