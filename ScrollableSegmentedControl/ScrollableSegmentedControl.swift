@@ -33,7 +33,7 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
     public var fixedSegmentWidth: Bool = true {
         didSet {
             if oldValue != fixedSegmentWidth {
-                setNeedsLayout()
+                collectionView?.setNeedsLayout()
                 flowLayout.invalidateLayout()
                 reloadSegments()
             }
@@ -58,6 +58,7 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
                 let indexPath = collectionView?.indexPathsForSelectedItems?.last
                 
                 setNeedsLayout()
+                collectionView?.setNeedsLayout()
                 flowLayout.invalidateLayout()
                 reloadSegments()
                 
@@ -274,9 +275,13 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
     override public func layoutSubviews() {
         super.layoutSubviews()
         
-        collectionView?.frame = CGRect(x: 0, y: 0, width: frame.size.width, height: frame.size.height)
-        collectionView?.contentOffset = CGPoint(x: 0, y: 0)
-        collectionView?.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+        guard let collectionView_ = collectionView else {
+            return
+        }
+        
+        collectionView_.frame = CGRect(x: 0, y: 0, width: frame.size.width, height: frame.size.height)
+        collectionView_.contentOffset = CGPoint(x: 0, y: 0)
+        collectionView_.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
         
         configureSegmentSize()
         
@@ -321,9 +326,11 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
                 }
             }
             
-            flowLayout.itemSize = CGSize(width: 10.0, height: frame.size.height)
+            flowLayout.estimatedItemSize = CGSize()
+            flowLayout.itemSize = CGSize(width: width, height: frame.size.height)
         } else {
-            width = 10.0
+            width = 1.0
+            flowLayout.itemSize = CGSize()
             flowLayout.estimatedItemSize = CGSize(width: width, height: frame.size.height)
         }
     }
@@ -508,6 +515,7 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
         var normalAttributedTitle:NSAttributedString?
         var highlightedAttributedTitle:NSAttributedString?
         var selectedAttributedTitle:NSAttributedString?
+        var variableConstraints = [NSLayoutConstraint]()
         
         var showUnderline:Bool = false {
             didSet {
@@ -555,6 +563,12 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
                 underline.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
                 underline.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
             }
+        }
+        
+        override func setNeedsUpdateConstraints() {
+            super.setNeedsUpdateConstraints()
+            NSLayoutConstraint.deactivate(variableConstraints)
+            variableConstraints.removeAll()
         }
         
         override var isHighlighted: Bool {
@@ -619,11 +633,20 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
             titleLabel.translatesAutoresizingMaskIntoConstraints = false
             titleLabel.textColor = BaseSegmentCollectionViewCell.defaultTextColor
             titleLabel.font = BaseSegmentCollectionViewCell.defaultFont
+        }
+        
+        override func updateConstraints() {
+            super.updateConstraints()
+            NSLayoutConstraint.deactivate(variableConstraints)
+            variableConstraints.removeAll()
             
-            titleLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
-            titleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor).isActive = true
-            titleLabel.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.leadingAnchor, constant: BaseSegmentCollectionViewCell.textPadding).isActive = true
-            contentView.trailingAnchor.constraint(greaterThanOrEqualTo: titleLabel.trailingAnchor, constant: BaseSegmentCollectionViewCell.textPadding).isActive = true
+            variableConstraints.append(titleLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor))
+            variableConstraints.append(titleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor))
+            variableConstraints.append(titleLabel.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.leadingAnchor, constant: BaseSegmentCollectionViewCell.textPadding))
+            let trailingConstraint = contentView.trailingAnchor.constraint(greaterThanOrEqualTo: titleLabel.trailingAnchor, constant: BaseSegmentCollectionViewCell.textPadding)
+            variableConstraints.append(trailingConstraint)
+            
+            NSLayoutConstraint.activate(variableConstraints)
         }
     }
     
@@ -662,11 +685,19 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
             contentView.addSubview(imageView)
             imageView.translatesAutoresizingMaskIntoConstraints = false
             imageView.tintColor = BaseSegmentCollectionViewCell.defaultTextColor
+        }
+        
+        override func updateConstraints() {
+            super.updateConstraints()
+            NSLayoutConstraint.deactivate(variableConstraints)
+            variableConstraints.removeAll()
             
-            imageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
-            imageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor).isActive = true
-            imageView.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.leadingAnchor, constant: BaseSegmentCollectionViewCell.textPadding).isActive = true
-            contentView.trailingAnchor.constraint(greaterThanOrEqualTo: imageView.trailingAnchor, constant: BaseSegmentCollectionViewCell.textPadding).isActive = true
+            variableConstraints.append(imageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor))
+            variableConstraints.append(imageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor))
+            variableConstraints.append(imageView.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.leadingAnchor, constant: BaseSegmentCollectionViewCell.textPadding))
+            variableConstraints.append(contentView.trailingAnchor.constraint(greaterThanOrEqualTo: imageView.trailingAnchor, constant: BaseSegmentCollectionViewCell.textPadding))
+            
+            NSLayoutConstraint.activate(variableConstraints)
         }
     }
     
@@ -735,11 +766,21 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
             contentView.addSubview(titleLabel)
             contentView.addSubview(imageView)
             
-            imageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
-            titleLabel.centerXAnchor.constraint(equalTo: imageView.centerXAnchor).isActive = true
-            titleLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -BaseSegmentCollectionViewCell.textPadding).isActive = true
-            imageView.bottomAnchor.constraint(equalTo: titleLabel.topAnchor, constant: -BaseSegmentCollectionViewCell.textPadding).isActive = true
-            imageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: BaseSegmentCollectionViewCell.textPadding).isActive = true
+
+        }
+        
+        override func updateConstraints() {
+            super.updateConstraints()
+            NSLayoutConstraint.deactivate(variableConstraints)
+            variableConstraints.removeAll()
+            
+            variableConstraints.append(imageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor))
+            variableConstraints.append(titleLabel.centerXAnchor.constraint(equalTo: imageView.centerXAnchor))
+            variableConstraints.append(titleLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -BaseSegmentCollectionViewCell.textPadding))
+            variableConstraints.append(imageView.bottomAnchor.constraint(equalTo: titleLabel.topAnchor, constant: -BaseSegmentCollectionViewCell.textPadding))
+            variableConstraints.append(imageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: BaseSegmentCollectionViewCell.textPadding))
+            
+            NSLayoutConstraint.activate(variableConstraints)
         }
     }
     
@@ -807,14 +848,22 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
             
             titleLabel.translatesAutoresizingMaskIntoConstraints = false
             imageView.translatesAutoresizingMaskIntoConstraints = false
+        }
+        
+        override func updateConstraints() {
+            super.updateConstraints()
+            NSLayoutConstraint.deactivate(variableConstraints)
+            variableConstraints.removeAll()
             
-            imageView.heightAnchor.constraint(equalToConstant: BaseSegmentCollectionViewCell.imageSize).isActive = true
-            imageView.widthAnchor.constraint(equalToConstant: BaseSegmentCollectionViewCell.imageSize).isActive = true
-            imageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor).isActive = true
-            imageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: BaseSegmentCollectionViewCell.textPadding).isActive = true
-            titleLabel.centerYAnchor.constraint(equalTo: imageView.centerYAnchor).isActive = true
-            titleLabel.leadingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: BaseSegmentCollectionViewCell.textPadding).isActive = true
-            contentView.trailingAnchor.constraint(greaterThanOrEqualTo: titleLabel.trailingAnchor, constant: BaseSegmentCollectionViewCell.textPadding).isActive = true
+            variableConstraints.append(imageView.heightAnchor.constraint(equalToConstant: BaseSegmentCollectionViewCell.imageSize))
+            variableConstraints.append(imageView.widthAnchor.constraint(equalToConstant: BaseSegmentCollectionViewCell.imageSize))
+            variableConstraints.append(imageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor))
+            variableConstraints.append(imageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: BaseSegmentCollectionViewCell.textPadding))
+            variableConstraints.append(titleLabel.centerYAnchor.constraint(equalTo: imageView.centerYAnchor))
+            variableConstraints.append(titleLabel.leadingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: BaseSegmentCollectionViewCell.textPadding))
+            variableConstraints.append(contentView.trailingAnchor.constraint(greaterThanOrEqualTo: titleLabel.trailingAnchor, constant: BaseSegmentCollectionViewCell.textPadding))
+            
+            NSLayoutConstraint.activate(variableConstraints)
         }
     }
 }

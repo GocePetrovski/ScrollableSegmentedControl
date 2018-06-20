@@ -13,6 +13,7 @@ class TableViewController: UITableViewController {
 
     @IBOutlet weak var segmentedControl: ScrollableSegmentedControl!
     @IBOutlet weak var removeSegmentButton: UIBarButtonItem!
+    @IBOutlet weak var fixedWidthSwitch: UISwitch!
     
     var selectedIndexPath = IndexPath(row: 0, section: 0)
     var selectedAttributesIndexPath = IndexPath(row: 0, section: 1)
@@ -30,14 +31,15 @@ class TableViewController: UITableViewController {
         segmentedControl.segmentStyle = .textOnly
         segmentedControl.insertSegment(withTitle: "Segment 1", image: #imageLiteral(resourceName: "segment-1"), at: 0)
         segmentedControl.insertSegment(withTitle: "S 2", image: #imageLiteral(resourceName: "segment-2"), at: 1)
-        segmentedControl.insertSegment(withTitle: "Segment 3", image: #imageLiteral(resourceName: "segment-3"), at: 2)
+        segmentedControl.insertSegment(withTitle: "Segment 3.0001", image: #imageLiteral(resourceName: "segment-3"), at: 2)
         segmentedControl.insertSegment(withTitle: "Seg 4", image: #imageLiteral(resourceName: "segment-4"), at: 3)
         segmentedControl.insertSegment(withTitle: "Segment 5", image: #imageLiteral(resourceName: "segment-5"), at: 4)
         segmentedControl.insertSegment(withTitle: "Segment 6", image: #imageLiteral(resourceName: "segment-6"), at: 5)
         
         segmentedControl.underlineSelected = true
         segmentedControl.selectedSegmentIndex = 0
-        segmentedControl.fixedSegmentWidth = false
+        fixedWidthSwitch.isOn = false
+        segmentedControl.fixedSegmentWidth = fixedWidthSwitch.isOn
         
         segmentedControl.addTarget(self, action: #selector(TableViewController.segmentSelected(sender:)), for: .valueChanged)
     }
@@ -57,6 +59,10 @@ class TableViewController: UITableViewController {
         }
     }
     
+    @IBAction func toggleFixedWidth(_ sender: UISwitch) {
+        segmentedControl.fixedSegmentWidth = sender.isOn
+        segmentedControl.setNeedsLayout()
+    }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -102,7 +108,7 @@ class TableViewController: UITableViewController {
             headerFrame.size.height =  CGFloat(height)
             headerView.frame = headerFrame
             tableView.tableHeaderView = headerView
-        } else {
+        } else if indexPath.section == 1  {
             if let cell = tableView.cellForRow(at: selectedAttributesIndexPath) {
                 cell.accessoryType = .none
             }
