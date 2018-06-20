@@ -38,7 +38,7 @@ class TableViewController: UITableViewController {
         
         segmentedControl.underlineSelected = true
         segmentedControl.selectedSegmentIndex = 0
-        fixedWidthSwitch.isOn = false
+        //fixedWidthSwitch.isOn = false
         segmentedControl.fixedSegmentWidth = fixedWidthSwitch.isOn
         
         segmentedControl.addTarget(self, action: #selector(TableViewController.segmentSelected(sender:)), for: .valueChanged)

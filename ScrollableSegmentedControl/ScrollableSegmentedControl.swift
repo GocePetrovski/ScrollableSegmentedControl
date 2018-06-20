@@ -651,7 +651,7 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
             variableConstraints.removeAll()
             
             variableConstraints.append(titleLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor))
-            variableConstraints.append(titleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor))            
+            variableConstraints.append(titleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor))
             variableConstraints.append(titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: BaseSegmentCollectionViewCell.textPadding))
             variableConstraints.append(titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -BaseSegmentCollectionViewCell.textPadding))
             
@@ -796,6 +796,7 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
     private class ImageOnLeftSegmentCollectionViewCell: BaseSegmentCollectionViewCell {
         let titleLabel = UILabel()
         let imageView = UIImageView()
+        let stackView = UIStackView()
         
         override var contentColor:UIColor? {
             didSet {
@@ -852,11 +853,24 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
             imageView.contentMode = .scaleAspectFit
             imageView.clipsToBounds = true
             
-            contentView.addSubview(titleLabel)
-            contentView.addSubview(imageView)
+            var imgFrame = imageView.frame
+            imgFrame.size = CGSize(width: BaseSegmentCollectionViewCell.imageSize, height: BaseSegmentCollectionViewCell.imageSize)
+            imageView.frame = imgFrame
+            
+            stackView.axis = .horizontal
+            stackView.distribution = .fill
+            stackView.spacing = BaseSegmentCollectionViewCell.textPadding
+            stackView.addArrangedSubview(imageView)
+            stackView.addArrangedSubview(titleLabel)
+            
+            stackView.translatesAutoresizingMaskIntoConstraints = false
+            
+            contentView.addSubview(stackView)
             
             titleLabel.translatesAutoresizingMaskIntoConstraints = false
             imageView.translatesAutoresizingMaskIntoConstraints = false
+            
+            
         }
         
         override func updateConstraints() {
@@ -866,11 +880,11 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
             
             variableConstraints.append(imageView.heightAnchor.constraint(equalToConstant: BaseSegmentCollectionViewCell.imageSize))
             variableConstraints.append(imageView.widthAnchor.constraint(equalToConstant: BaseSegmentCollectionViewCell.imageSize))
-            variableConstraints.append(imageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor))
-            variableConstraints.append(imageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: BaseSegmentCollectionViewCell.textPadding))
-            variableConstraints.append(titleLabel.centerYAnchor.constraint(equalTo: imageView.centerYAnchor))
-            variableConstraints.append(titleLabel.leadingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: BaseSegmentCollectionViewCell.textPadding))
-            variableConstraints.append(contentView.trailingAnchor.constraint(greaterThanOrEqualTo: titleLabel.trailingAnchor, constant: BaseSegmentCollectionViewCell.textPadding))
+            
+            variableConstraints.append(stackView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor))
+            variableConstraints.append(stackView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor))
+            variableConstraints.append(stackView.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.leadingAnchor, constant: BaseSegmentCollectionViewCell.textPadding))
+            variableConstraints.append(contentView.trailingAnchor.constraint(greaterThanOrEqualTo: stackView.trailingAnchor, constant: BaseSegmentCollectionViewCell.textPadding))
             
             NSLayoutConstraint.activate(variableConstraints)
         }
