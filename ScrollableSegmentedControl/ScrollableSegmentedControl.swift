@@ -33,9 +33,7 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
     public var fixedSegmentWidth: Bool = true {
         didSet {
             if oldValue != fixedSegmentWidth {
-                collectionView?.setNeedsLayout()
-                flowLayout.invalidateLayout()
-                reloadSegments()
+                setNeedsLayout()
             }
         }
     }
@@ -44,30 +42,42 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
     @objc public var segmentStyle:ScrollableSegmentedControlSegmentStyle = .textOnly {
         didSet {
             if oldValue != segmentStyle {
-                switch segmentStyle {
-                case .textOnly:
-                    collectionView?.register(TextOnlySegmentCollectionViewCell.self, forCellWithReuseIdentifier: CollectionViewController.textOnlyCellIdentifier)
-                case .imageOnly:
-                    collectionView?.register(ImageOnlySegmentCollectionViewCell.self, forCellWithReuseIdentifier: CollectionViewController.imageOnlyCellIdentifier)
-                case .imageOnTop:
-                    collectionView?.register(ImageOnTopSegmentCollectionViewCell.self, forCellWithReuseIdentifier: CollectionViewController.imageOnTopCellIdentifier)
-                case .imageOnLeft:
-                    collectionView?.register(ImageOnLeftSegmentCollectionViewCell.self, forCellWithReuseIdentifier: CollectionViewController.imageOnLeftCellIdentifier)
+                if let collectionView_ = collectionView {
+                    let nilCellClass:AnyClass? = nil
+                    // unregister the old cell
+                    switch oldValue {
+                    case .textOnly:
+                        collectionView_.register(nilCellClass, forCellWithReuseIdentifier: CollectionViewController.textOnlyCellIdentifier)
+                    case .imageOnly:
+                        collectionView_.register(nilCellClass, forCellWithReuseIdentifier: CollectionViewController.imageOnlyCellIdentifier)
+                    case .imageOnTop:
+                        collectionView_.register(nilCellClass, forCellWithReuseIdentifier: CollectionViewController.imageOnTopCellIdentifier)
+                    case .imageOnLeft:
+                        collectionView_.register(nilCellClass, forCellWithReuseIdentifier: CollectionViewController.imageOnLeftCellIdentifier)
+                    }
+
+                    // register the new cell
+                    switch segmentStyle {
+                    case .textOnly:
+                        collectionView_.register(TextOnlySegmentCollectionViewCell.self, forCellWithReuseIdentifier: CollectionViewController.textOnlyCellIdentifier)
+                    case .imageOnly:
+                        collectionView_.register(ImageOnlySegmentCollectionViewCell.self, forCellWithReuseIdentifier: CollectionViewController.imageOnlyCellIdentifier)
+                    case .imageOnTop:
+                        collectionView_.register(ImageOnTopSegmentCollectionViewCell.self, forCellWithReuseIdentifier: CollectionViewController.imageOnTopCellIdentifier)
+                    case .imageOnLeft:
+                        collectionView_.register(ImageOnLeftSegmentCollectionViewCell.self, forCellWithReuseIdentifier: CollectionViewController.imageOnLeftCellIdentifier)
+                    }
+                    
+                    let indexPath = collectionView?.indexPathsForSelectedItems?.last
+                    
+                    setNeedsLayout()
+                    
+                    if indexPath != nil {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05, execute: {
+                            self.collectionView?.selectItem(at: indexPath, animated: true, scrollPosition: UICollectionViewScrollPosition.left)
+                        })
+                    }
                 }
-                
-                let indexPath = collectionView?.indexPathsForSelectedItems?.last
-                
-                setNeedsLayout()
-                collectionView?.setNeedsLayout()
-                flowLayout.invalidateLayout()
-                reloadSegments()
-                
-                if indexPath != nil {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.05, execute: {
-                        self.collectionView?.selectItem(at: indexPath, animated: true, scrollPosition: UICollectionViewScrollPosition.left)
-                    })
-                }
-                
             }
         }
     }
@@ -279,14 +289,13 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
             return
         }
         
+        flowLayout.invalidateLayout()
+        
         collectionView_.frame = CGRect(x: 0, y: 0, width: frame.size.width, height: frame.size.height)
         collectionView_.contentOffset = CGPoint(x: 0, y: 0)
         collectionView_.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
         
         configureSegmentSize()
-        
-        flowLayout.invalidateLayout()
-        
         reloadSegments()
     }
     
@@ -633,6 +642,7 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
             titleLabel.translatesAutoresizingMaskIntoConstraints = false
             titleLabel.textColor = BaseSegmentCollectionViewCell.defaultTextColor
             titleLabel.font = BaseSegmentCollectionViewCell.defaultFont
+            titleLabel.textAlignment = .center
         }
         
         override func updateConstraints() {
@@ -641,10 +651,9 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
             variableConstraints.removeAll()
             
             variableConstraints.append(titleLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor))
-            variableConstraints.append(titleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor))
-            variableConstraints.append(titleLabel.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.leadingAnchor, constant: BaseSegmentCollectionViewCell.textPadding))
-            let trailingConstraint = contentView.trailingAnchor.constraint(greaterThanOrEqualTo: titleLabel.trailingAnchor, constant: BaseSegmentCollectionViewCell.textPadding)
-            variableConstraints.append(trailingConstraint)
+            variableConstraints.append(titleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor))            
+            variableConstraints.append(titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: BaseSegmentCollectionViewCell.textPadding))
+            variableConstraints.append(titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -BaseSegmentCollectionViewCell.textPadding))
             
             NSLayoutConstraint.activate(variableConstraints)
         }

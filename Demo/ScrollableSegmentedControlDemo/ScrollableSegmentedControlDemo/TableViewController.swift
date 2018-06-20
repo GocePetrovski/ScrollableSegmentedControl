@@ -44,6 +44,13 @@ class TableViewController: UITableViewController {
         segmentedControl.addTarget(self, action: #selector(TableViewController.segmentSelected(sender:)), for: .valueChanged)
     }
     
+//    override func viewDidAppear(_ animated: Bool) {
+//        super.viewDidAppear(animated)
+//        
+//        tableView.selectRow(at: IndexPath(row: 2, section: 0), animated: true, scrollPosition: .top)
+//        self.tableView(tableView, didSelectRowAt: IndexPath(row: 2, section: 0))
+//    }
+    
     @objc func segmentSelected(sender:ScrollableSegmentedControl) {
         print("Segment at index \(sender.selectedSegmentIndex)  selected")
     }
