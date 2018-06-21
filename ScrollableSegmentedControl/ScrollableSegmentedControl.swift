@@ -289,12 +289,11 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
             return
         }
         
-        flowLayout.invalidateLayout()
-        
         collectionView_.frame = CGRect(x: 0, y: 0, width: frame.size.width, height: frame.size.height)
         collectionView_.contentOffset = CGPoint(x: 0, y: 0)
         collectionView_.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
         
+        flowLayout.invalidateLayout()
         configureSegmentSize()
         reloadSegments()
     }
@@ -339,7 +338,7 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
             flowLayout.itemSize = CGSize(width: width, height: frame.size.height)
         } else {
             width = 1.0
-            flowLayout.itemSize = CGSize()
+            flowLayout.itemSize = CGSize(width: width, height: frame.size.height)
             flowLayout.estimatedItemSize = CGSize(width: width, height: frame.size.height)
         }
     }
