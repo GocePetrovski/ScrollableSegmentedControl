@@ -709,10 +709,10 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
         }
     }
     
-    private class ImageOnTopSegmentCollectionViewCell: BaseSegmentCollectionViewCell {
+    private class BaseImageSegmentCollectionViewCell: BaseSegmentCollectionViewCell {
         let titleLabel = UILabel()
         let imageView = UIImageView()
-        let stackView = UIStackView()
+        internal let stackView = UIStackView()
         
         override var contentColor:UIColor? {
             didSet {
@@ -726,7 +726,7 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
                 titleLabel.highlightedTextColor = (selectedContentColor == nil) ? UIColor.black : selectedContentColor!
             }
         }
-        
+
         override var isHighlighted: Bool {
             didSet {
                 if let title = (isHighlighted) ? super.highlightedAttributedTitle : super.normalAttributedTitle {
@@ -771,9 +771,7 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
             
             titleLabel.translatesAutoresizingMaskIntoConstraints = false
             imageView.translatesAutoresizingMaskIntoConstraints = false
-
             
-            stackView.axis = .vertical
             stackView.distribution = .fill
             stackView.spacing = BaseSegmentCollectionViewCell.textPadding
             stackView.addArrangedSubview(imageView)
@@ -787,7 +785,7 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
             super.updateConstraints()
             NSLayoutConstraint.deactivate(variableConstraints)
             variableConstraints.removeAll()
-                        
+            
             variableConstraints.append(stackView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor))
             variableConstraints.append(stackView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor))
             variableConstraints.append(stackView.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.leadingAnchor, constant: BaseSegmentCollectionViewCell.textPadding))
@@ -797,98 +795,23 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
         }
     }
     
-    private class ImageOnLeftSegmentCollectionViewCell: BaseSegmentCollectionViewCell {
-        let titleLabel = UILabel()
-        let imageView = UIImageView()
-        let stackView = UIStackView()
-        
-        override var contentColor:UIColor? {
-            didSet {
-                titleLabel.textColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
-                imageView.tintColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
-            }
-        }
-        
-        override var selectedContentColor:UIColor? {
-            didSet {
-                titleLabel.highlightedTextColor = (selectedContentColor == nil) ? UIColor.black : selectedContentColor!
-            }
-        }
-        
-        override var isHighlighted: Bool {
-            didSet {
-                if let title = (isHighlighted) ? super.highlightedAttributedTitle : super.normalAttributedTitle {
-                    titleLabel.attributedText = title
-                } else {
-                    titleLabel.isHighlighted = isHighlighted
-                }
-                
-                if isHighlighted {
-                    imageView.tintColor = (selectedContentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : selectedContentColor!
-                } else {
-                    imageView.tintColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
-                }
-            }
-        }
-        
-        override var isSelected: Bool {
-            didSet {
-                if isSelected {
-                    if let title = super.selectedAttributedTitle {
-                        titleLabel.attributedText = title
-                    } else {
-                        titleLabel.textColor = (selectedContentColor == nil) ? UIColor.black : selectedContentColor!
-                    }
-                    imageView.tintColor = (selectedContentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : selectedContentColor!
-                } else {
-                    if let title = super.normalAttributedTitle {
-                        titleLabel.attributedText = title
-                    } else {
-                        titleLabel.textColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
-                    }
-                    imageView.tintColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
-                }
-            }
-        }
-        
+    private class ImageOnTopSegmentCollectionViewCell: BaseImageSegmentCollectionViewCell {
         override func configure(){
             super.configure()
-            titleLabel.font = BaseSegmentCollectionViewCell.defaultFont
-            imageView.contentMode = .scaleAspectFit
-            imageView.clipsToBounds = true
-            
+            stackView.axis = .vertical
+        }
+    }
+    
+    private class ImageOnLeftSegmentCollectionViewCell: BaseImageSegmentCollectionViewCell {
+        override func configure(){
+            super.configure()
             var imgFrame = imageView.frame
             imgFrame.size = CGSize(width: BaseSegmentCollectionViewCell.imageSize, height: BaseSegmentCollectionViewCell.imageSize)
             imageView.frame = imgFrame
+            imageView.heightAnchor.constraint(equalToConstant: BaseSegmentCollectionViewCell.imageSize).isActive = true
+            imageView.widthAnchor.constraint(equalToConstant: BaseSegmentCollectionViewCell.imageSize).isActive = true
             
             stackView.axis = .horizontal
-            stackView.distribution = .fill
-            stackView.spacing = BaseSegmentCollectionViewCell.textPadding
-            stackView.addArrangedSubview(imageView)
-            stackView.addArrangedSubview(titleLabel)
-            
-            stackView.translatesAutoresizingMaskIntoConstraints = false
-            
-            contentView.addSubview(stackView)
-            
-            titleLabel.translatesAutoresizingMaskIntoConstraints = false
-            imageView.translatesAutoresizingMaskIntoConstraints = false
-        }
-        
-        override func updateConstraints() {
-            super.updateConstraints()
-            NSLayoutConstraint.deactivate(variableConstraints)
-            variableConstraints.removeAll()
-            
-            variableConstraints.append(imageView.heightAnchor.constraint(equalToConstant: BaseSegmentCollectionViewCell.imageSize))
-            variableConstraints.append(imageView.widthAnchor.constraint(equalToConstant: BaseSegmentCollectionViewCell.imageSize))
-            
-            variableConstraints.append(stackView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor))
-            variableConstraints.append(stackView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor))
-            variableConstraints.append(stackView.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.leadingAnchor, constant: BaseSegmentCollectionViewCell.textPadding))
-            variableConstraints.append(contentView.trailingAnchor.constraint(greaterThanOrEqualTo: stackView.trailingAnchor, constant: BaseSegmentCollectionViewCell.textPadding))
-            
-            NSLayoutConstraint.activate(variableConstraints)
         }
     }
 }
