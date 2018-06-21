@@ -713,6 +713,7 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
     private class ImageOnTopSegmentCollectionViewCell: BaseSegmentCollectionViewCell {
         let titleLabel = UILabel()
         let imageView = UIImageView()
+        let stackView = UIStackView()
         
         override var contentColor:UIColor? {
             didSet {
@@ -771,23 +772,27 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
             
             titleLabel.translatesAutoresizingMaskIntoConstraints = false
             imageView.translatesAutoresizingMaskIntoConstraints = false
-            
-            contentView.addSubview(titleLabel)
-            contentView.addSubview(imageView)
-            
 
+            
+            stackView.axis = .vertical
+            stackView.distribution = .fill
+            stackView.spacing = BaseSegmentCollectionViewCell.textPadding
+            stackView.addArrangedSubview(imageView)
+            stackView.addArrangedSubview(titleLabel)
+            
+            stackView.translatesAutoresizingMaskIntoConstraints = false
+            contentView.addSubview(stackView)
         }
         
         override func updateConstraints() {
             super.updateConstraints()
             NSLayoutConstraint.deactivate(variableConstraints)
             variableConstraints.removeAll()
-            
-            variableConstraints.append(imageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor))
-            variableConstraints.append(titleLabel.centerXAnchor.constraint(equalTo: imageView.centerXAnchor))
-            variableConstraints.append(titleLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -BaseSegmentCollectionViewCell.textPadding))
-            variableConstraints.append(imageView.bottomAnchor.constraint(equalTo: titleLabel.topAnchor, constant: -BaseSegmentCollectionViewCell.textPadding))
-            variableConstraints.append(imageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: BaseSegmentCollectionViewCell.textPadding))
+                        
+            variableConstraints.append(stackView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor))
+            variableConstraints.append(stackView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor))
+            variableConstraints.append(stackView.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.leadingAnchor, constant: BaseSegmentCollectionViewCell.textPadding))
+            variableConstraints.append(contentView.trailingAnchor.constraint(greaterThanOrEqualTo: stackView.trailingAnchor, constant: BaseSegmentCollectionViewCell.textPadding))
             
             NSLayoutConstraint.activate(variableConstraints)
         }
@@ -869,8 +874,6 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
             
             titleLabel.translatesAutoresizingMaskIntoConstraints = false
             imageView.translatesAutoresizingMaskIntoConstraints = false
-            
-            
         }
         
         override func updateConstraints() {
