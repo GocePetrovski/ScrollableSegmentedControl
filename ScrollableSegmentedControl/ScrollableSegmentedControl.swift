@@ -462,6 +462,7 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
             segmentCell.showUnderline = segmentedControl.underlineSelected
             segmentCell.underlineUnselectedColor = segmentedControl.underlineUnselectedColor
             segmentCell.underlineUnselectedMargins = segmentedControl.underlineUnselectedMargins
+            segmentCell.underlineHeight = segmentedControl.underlineHeight
             if segmentedControl.underlineSelected {
                 segmentCell.tintColor = segmentedControl.tintColor
             }
