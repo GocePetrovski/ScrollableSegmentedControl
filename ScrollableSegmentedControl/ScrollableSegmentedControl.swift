@@ -37,7 +37,20 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
             }
         }
     }
-    
+
+    /**
+     A Boolean value that determines if the width of the segment is going to fit the screen width.
+
+     When this value is set to true all segments have the same width which equivalent of the width required to display all the segments on screen.
+     The default value is false.
+     */
+    public var segmentWidthFitScreenSize: Bool = false {
+        didSet {
+            if oldValue != segmentWidthFitScreenSize {
+                setNeedsLayout()
+            }
+        }
+    }
     
     @objc public var segmentStyle:ScrollableSegmentedControlSegmentStyle = .textOnly {
         didSet {
@@ -324,8 +337,13 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
     
     fileprivate func configureSegmentSize() {
         let width:CGFloat
-        
-        if fixedSegmentWidth == true {
+
+        if segmentWidthFitScreenSize {
+            width = UIScreen.main.bounds.width / CGFloat(segmentsData.count)
+
+            flowLayout.estimatedItemSize = CGSize()
+            flowLayout.itemSize = CGSize(width: width, height: frame.size.height)
+        } else if fixedSegmentWidth == true {
             switch segmentStyle {
             case .imageOnLeft:
                 width = longestTextWidth + BaseSegmentCollectionViewCell.imageSize + BaseSegmentCollectionViewCell.imageToTextMargin * 2
@@ -336,7 +354,7 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
                     width = longestTextWidth
                 }
             }
-            
+
             flowLayout.estimatedItemSize = CGSize()
             flowLayout.itemSize = CGSize(width: width, height: frame.size.height)
         } else {
