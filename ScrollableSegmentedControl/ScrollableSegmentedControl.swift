@@ -480,7 +480,7 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
             
             segmentCell.showUnderline = segmentedControl.underlineSelected
             segmentCell.underlineUnselectedColor = segmentedControl.underlineUnselectedColor
-            segmentCell.underlineSelectedMarings = segmentedControl.underlineSelectedMargins
+            segmentCell.underlineSelectedMargins = segmentedControl.underlineSelectedMargins
             segmentCell.underlineUnselectedMargins = segmentedControl.underlineUnselectedMargins
             segmentCell.underlineHeight = segmentedControl.underlineHeight
             if segmentedControl.underlineSelected {
@@ -551,7 +551,7 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
         var selectedAttributedTitle:NSAttributedString?
         var variableConstraints = [NSLayoutConstraint]()
         var underlineUnselectedColor: UIColor?
-        var underlineSelectedMarings: CGFloat = 0 {
+        var underlineSelectedMargins: CGFloat = 0 {
             didSet {
                 updateUnderlineConstraints()
             }
@@ -625,8 +625,8 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
         }
 
         private func updateUnderlineConstraints() {
-            self.leadingContraint?.constant = self.isSelected ? self.underlineSelectedMarings : self.underlineUnselectedMargins
-            self.trailingContraint?.constant = self.isSelected ? -self.underlineSelectedMarings : -self.underlineUnselectedMargins
+            self.leadingContraint?.constant = self.isSelected ? self.underlineSelectedMargins : self.underlineUnselectedMargins
+            self.trailingContraint?.constant = self.isSelected ? -self.underlineSelectedMargins : -self.underlineUnselectedMargins
             self.heightConstraint?.constant = self.underlineHeight
         }
         
