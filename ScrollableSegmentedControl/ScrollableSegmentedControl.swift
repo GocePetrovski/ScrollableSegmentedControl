@@ -293,6 +293,7 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
     @IBInspectable
     @objc public var underlineSelected:Bool = false
     @objc public var underlineUnselectedColor:UIColor = .clear
+    @objc public var underlineSelectedMargins: CGFloat = 0
     @objc public var underlineUnselectedMargins: CGFloat = 0
     
     @objc public var underlineHeight: CGFloat = 3
@@ -479,6 +480,7 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
             
             segmentCell.showUnderline = segmentedControl.underlineSelected
             segmentCell.underlineUnselectedColor = segmentedControl.underlineUnselectedColor
+            segmentCell.underlineSelectedMarings = segmentedControl.underlineSelectedMargins
             segmentCell.underlineUnselectedMargins = segmentedControl.underlineUnselectedMargins
             segmentCell.underlineHeight = segmentedControl.underlineHeight
             if segmentedControl.underlineSelected {
@@ -549,6 +551,11 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
         var selectedAttributedTitle:NSAttributedString?
         var variableConstraints = [NSLayoutConstraint]()
         var underlineUnselectedColor: UIColor?
+        var underlineSelectedMarings: CGFloat = 0 {
+            didSet {
+                updateUnderlineConstraints()
+            }
+        }
         var underlineUnselectedMargins: CGFloat = 0 {
             didSet {
                 updateUnderlineConstraints()
@@ -618,8 +625,8 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
         }
 
         private func updateUnderlineConstraints() {
-            self.leadingContraint?.constant = self.isSelected ? 0 : self.underlineUnselectedMargins
-            self.trailingContraint?.constant = self.isSelected ? 0 : -self.underlineUnselectedMargins
+            self.leadingContraint?.constant = self.isSelected ? self.underlineSelectedMarings : self.underlineUnselectedMargins
+            self.trailingContraint?.constant = self.isSelected ? -self.underlineSelectedMarings : -self.underlineUnselectedMargins
             self.heightConstraint?.constant = self.underlineHeight
         }
         
