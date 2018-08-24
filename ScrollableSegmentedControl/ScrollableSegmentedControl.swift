@@ -282,6 +282,7 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
     @objc public var underlineUnselectedColor:UIColor = .clear
     @objc public var underlineUnselectedMargins: CGFloat = 0
     
+    @objc public var underlineHeight: CGFloat = 3
     // MARK: - Layout management
     
     override public func layoutSubviews() {
@@ -534,7 +535,13 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
                 updateUnderlineConstraints()
             }
         }
+        var underlineHeight: CGFloat = 3 {
+            didSet {
+                updateUnderlineConstraints()
+            }
+        }
 
+        var heightConstraint: NSLayoutConstraint?
         var leadingContraint: NSLayoutConstraint?
         var trailingContraint: NSLayoutConstraint?
         
@@ -579,7 +586,8 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
         private func configureConstraints() {
             if let underline = underlineView {
                 underline.translatesAutoresizingMaskIntoConstraints = false
-                underline.heightAnchor.constraint(equalToConstant: 3.0).isActive = true
+                heightConstraint = underline.heightAnchor.constraint(equalToConstant: 3)
+                heightConstraint?.isActive = true
                 leadingContraint = underline.leadingAnchor.constraint(equalTo: contentView.leadingAnchor)
                 leadingContraint?.isActive = true
                 trailingContraint = underline.trailingAnchor.constraint(equalTo: contentView.trailingAnchor)
@@ -593,6 +601,7 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
         private func updateUnderlineConstraints() {
             self.leadingContraint?.constant = self.isSelected ? 0 : self.underlineUnselectedMargins
             self.trailingContraint?.constant = self.isSelected ? 0 : -self.underlineUnselectedMargins
+            self.heightConstraint?.constant = self.underlineHeight
         }
         
         override func setNeedsUpdateConstraints() {
