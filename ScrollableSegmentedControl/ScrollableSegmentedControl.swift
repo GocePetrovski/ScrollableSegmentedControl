@@ -279,6 +279,7 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
      */
     @IBInspectable
     @objc public var underlineSelected:Bool = false
+    @objc public var underlineUnselectedColor:UIColor = .clear
     
     // MARK: - Layout management
     
@@ -457,6 +458,7 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
             }
             
             segmentCell.showUnderline = segmentedControl.underlineSelected
+            segmentCell.underlineUnselectedColor = segmentedControl.underlineUnselectedColor
             if segmentedControl.underlineSelected {
                 segmentCell.tintColor = segmentedControl.tintColor
             }
@@ -524,6 +526,7 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
         var highlightedAttributedTitle:NSAttributedString?
         var selectedAttributedTitle:NSAttributedString?
         var variableConstraints = [NSLayoutConstraint]()
+        var underlineUnselectedColor: UIColor?
         
         var showUnderline:Bool = false {
             didSet {
@@ -533,8 +536,8 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
                     } else {
                         underlineView = UIView()
                         underlineView!.tag = 999
-                        underlineView!.backgroundColor = tintColor
-                        underlineView!.isHidden = !isSelected
+                        underlineView!.backgroundColor = isSelected ? tintColor : underlineUnselectedColor
+                        underlineView!.isHidden = false
                         contentView.insertSubview(underlineView!, at: contentView.subviews.count)
                     }
                     
@@ -542,10 +545,10 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
                 }
             }
         }
-        
+
         override var tintColor: UIColor!{
             didSet{
-                underlineView?.backgroundColor = tintColor
+                underlineView?.backgroundColor = isSelected ? tintColor : underlineUnselectedColor
             }
         }
         
@@ -578,16 +581,10 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
             NSLayoutConstraint.deactivate(variableConstraints)
             variableConstraints.removeAll()
         }
-        
-        override var isHighlighted: Bool {
-            didSet {
-                underlineView?.isHidden = !isHighlighted
-            }
-        }
-        
+
         override var isSelected: Bool {
             didSet {
-                underlineView?.isHidden = !isSelected
+                underlineView?.backgroundColor = isSelected ? tintColor : underlineUnselectedColor
             }
         }
     }
