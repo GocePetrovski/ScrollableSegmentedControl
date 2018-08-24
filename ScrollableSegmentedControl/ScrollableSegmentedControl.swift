@@ -280,6 +280,7 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
     @IBInspectable
     @objc public var underlineSelected:Bool = false
     @objc public var underlineUnselectedColor:UIColor = .clear
+    @objc public var underlineUnselectedMargins: CGFloat = 0
     
     // MARK: - Layout management
     
@@ -459,6 +460,7 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
             
             segmentCell.showUnderline = segmentedControl.underlineSelected
             segmentCell.underlineUnselectedColor = segmentedControl.underlineUnselectedColor
+            segmentCell.underlineUnselectedMargins = segmentedControl.underlineUnselectedMargins
             if segmentedControl.underlineSelected {
                 segmentCell.tintColor = segmentedControl.tintColor
             }
@@ -527,6 +529,14 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
         var selectedAttributedTitle:NSAttributedString?
         var variableConstraints = [NSLayoutConstraint]()
         var underlineUnselectedColor: UIColor?
+        var underlineUnselectedMargins: CGFloat = 0 {
+            didSet {
+                updateUnderlineConstraints()
+            }
+        }
+
+        var leadingContraint: NSLayoutConstraint?
+        var trailingContraint: NSLayoutConstraint?
         
         var showUnderline:Bool = false {
             didSet {
@@ -570,10 +580,19 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
             if let underline = underlineView {
                 underline.translatesAutoresizingMaskIntoConstraints = false
                 underline.heightAnchor.constraint(equalToConstant: 3.0).isActive = true
-                underline.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
-                underline.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
+                leadingContraint = underline.leadingAnchor.constraint(equalTo: contentView.leadingAnchor)
+                leadingContraint?.isActive = true
+                trailingContraint = underline.trailingAnchor.constraint(equalTo: contentView.trailingAnchor)
+                trailingContraint?.isActive = true
                 underline.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
+
+                updateUnderlineConstraints()
             }
+        }
+
+        private func updateUnderlineConstraints() {
+            self.leadingContraint?.constant = self.isSelected ? 0 : self.underlineUnselectedMargins
+            self.trailingContraint?.constant = self.isSelected ? 0 : -self.underlineUnselectedMargins
         }
         
         override func setNeedsUpdateConstraints() {
@@ -585,6 +604,7 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
         override var isSelected: Bool {
             didSet {
                 underlineView?.backgroundColor = isSelected ? tintColor : underlineUnselectedColor
+                updateUnderlineConstraints()
             }
         }
     }
