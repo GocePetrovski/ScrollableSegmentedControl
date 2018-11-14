@@ -18,12 +18,12 @@ class TableViewController: UITableViewController {
     var selectedIndexPath = IndexPath(row: 0, section: 0)
     var selectedAttributesIndexPath = IndexPath(row: 0, section: 1)
     
-    let largerRedTextAttributes = [NSAttributedStringKey.font: UIFont.systemFont(ofSize: 16),
-                                   NSAttributedStringKey.foregroundColor: UIColor.red]
-    let largerRedTextHighlightAttributes = [NSAttributedStringKey.font: UIFont.systemFont(ofSize: 16),
-                                            NSAttributedStringKey.foregroundColor: UIColor.blue]
-    let largerRedTextSelectAttributes = [NSAttributedStringKey.font: UIFont.systemFont(ofSize: 16),
-                                         NSAttributedStringKey.foregroundColor: UIColor.orange]
+    let largerRedTextAttributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 16),
+                                   NSAttributedString.Key.foregroundColor: UIColor.red]
+    let largerRedTextHighlightAttributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 16),
+                                            NSAttributedString.Key.foregroundColor: UIColor.blue]
+    let largerRedTextSelectAttributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 16),
+                                         NSAttributedString.Key.foregroundColor: UIColor.orange]
     
     override func viewDidLoad() {
         super.viewDidLoad()

@@ -9,6 +9,7 @@ Pod::Spec.new do |s|
   s.source = { :git => 'https://github.com/GocePetrovski/ScrollableSegmentedControl.git', :tag => s.version }
 
   s.platform = :ios, '9.0'
+  s.swift_version = '4.2'
 
   s.source_files = 'ScrollableSegmentedControl/*.swift'
 end
