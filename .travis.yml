@@ -1,3 +1,3 @@
 language: swift
-osx_image: xcode9.4
+osx_image: xcode10.1
 xcode_project: ScrollableSegmentedControl.xcodeproj

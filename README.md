@@ -22,8 +22,8 @@ ScrollableSegmentedControl supports 4 styles of segments: text only, image only,
 
 ### Support
 
-- Xcode 9.0+
-- Swift 4.0+
+- Xcode 10.0+
+- Swift 4.2+
 - iOS 9.0+
 
 
@@ -53,6 +53,10 @@ override func viewDidLoad() {
     segmentedControl.segmentContentColor = UIColor.white
     segmentedControl.selectedSegmentContentColor = UIColor.yellow
     segmentedControl.backgroundColor = UIColor.black
+    
+    // Turn off all segments been fixed/equal width. 
+    // The width of each segment would be based on the text length and font size. 
+    segmentedControl.fixedSegmentWidth = false
 }
     
 func segmentSelected(sender:ScrollableSegmentedControl) {
@@ -94,7 +98,7 @@ See the Demo project for example on how to use it.
 The easiest way of installing ScrollableSegmentedControl is via [CocoaPods](http://cocoapods.org/). 
 
 ```
-pod 'ScrollableSegmentedControl', '~> 1.3.0'
+pod 'ScrollableSegmentedControl', '~> 1.4.0'
 ```
 
 ### Old-fashioned way
