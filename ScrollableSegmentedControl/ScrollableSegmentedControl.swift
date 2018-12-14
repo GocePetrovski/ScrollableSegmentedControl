@@ -119,7 +119,10 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
             reloadSegments()
         }
     }
-    
+
+    @objc public dynamic var badgeYRatio: CGFloat = 0
+    @objc public dynamic var badgeViewSize: CGFloat = 10
+    @objc public dynamic var badgeColor: UIColor = .red
     
     override public init(frame: CGRect) {
         super.init(frame: frame)
@@ -471,7 +474,10 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
                 cell.titleLabel.text = data.title
                 cell.imageView.image = data.image
                 cell.badgeView.isHidden = !data.badge
-                
+                cell.badgeView.frame = CGRect(x: cell.frame.size.width / 2 + segmentedControl.badgeViewSize, y: cell.frame.size.height * segmentedControl.badgeYRatio - segmentedControl.badgeViewSize / 2, width: segmentedControl.badgeViewSize, height: segmentedControl.badgeViewSize)
+                cell.badgeView.layer.cornerRadius = segmentedControl.badgeViewSize / 2
+                cell.badgeView.backgroundColor = segmentedControl.badgeColor
+
                 segmentCell = cell
             case .imageOnLeft:
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CollectionViewController.imageOnLeftCellIdentifier, for: indexPath) as! ImageOnLeftSegmentCollectionViewCell
@@ -834,11 +840,6 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
             stackView.addArrangedSubview(titleLabel)
             
             stackView.translatesAutoresizingMaskIntoConstraints = false
-
-            badgeView.backgroundColor = .red
-            let badgeViewSize = CGFloat(10)
-            badgeView.frame = CGRect(x: contentView.frame.size.width / 2 + badgeViewSize, y: 0, width: badgeViewSize, height: badgeViewSize)
-            badgeView.layer.cornerRadius = badgeViewSize / 2
             badgeView.isHidden = true
             contentView.addSubview(stackView)
             contentView.addSubview(badgeView)
