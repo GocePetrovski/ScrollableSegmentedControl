@@ -222,12 +222,13 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
     /**
      Inserts a segment at a specific position in the receiver and gives it a title as content and/or image as content.
      */
-    @objc public func insertSegment(withTitle title: String?, image: UIImage?, at index: Int) {
+    @objc public func insertSegment(withTitle title: String?, image: UIImage?, at index: Int, withBadge: Bool = false) {
         let segment = SegmentData()
         segment.title = title
         segment.image = image?.withRenderingMode(.alwaysTemplate)
+        segment.badge = withBadge
         segmentsData.insert(segment, at: index)
-        
+
         if let str = title {
             calculateLongestTextWidth(text: str)
         }
@@ -421,6 +422,7 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
         var highlightedAttributedTitle:NSAttributedString?
         var selectedAttributedTitle:NSAttributedString?
         var image:UIImage?
+        var badge:Bool = false
     }
     
     // MARK : - CollectionViewController
@@ -468,6 +470,7 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CollectionViewController.imageOnTopCellIdentifier, for: indexPath) as! ImageOnTopSegmentCollectionViewCell
                 cell.titleLabel.text = data.title
                 cell.imageView.image = data.image
+                cell.badgeView.isHidden = !data.badge
                 
                 segmentCell = cell
             case .imageOnLeft:
@@ -764,6 +767,7 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
     private class BaseImageSegmentCollectionViewCell: BaseSegmentCollectionViewCell {
         let titleLabel = UILabel()
         let imageView = UIImageView()
+        let badgeView = UIView()
         internal let stackView = UIStackView()
         
         override var contentColor:UIColor? {
@@ -830,7 +834,14 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
             stackView.addArrangedSubview(titleLabel)
             
             stackView.translatesAutoresizingMaskIntoConstraints = false
+
+            badgeView.backgroundColor = .red
+            let badgeViewSize = CGFloat(10)
+            badgeView.frame = CGRect(x: contentView.frame.size.width / 2 + badgeViewSize, y: 0, width: badgeViewSize, height: badgeViewSize)
+            badgeView.layer.cornerRadius = badgeViewSize / 2
+            badgeView.isHidden = true
             contentView.addSubview(stackView)
+            contentView.addSubview(badgeView)
         }
         
         override func updateConstraints() {
