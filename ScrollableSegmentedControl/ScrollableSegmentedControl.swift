@@ -237,7 +237,14 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
         }
         reloadSegments()
     }
-    
+
+    @objc public func updateSegmentBadge(at index: Int, withBadge: Bool = false) {
+        let segment = segmentsData[index]
+        segment.badge = withBadge
+
+        reloadSegments()
+    }
+
     /**
      Removes segment at a specific position from the receiver.
      */
@@ -284,13 +291,17 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
                     collectionView?.deselectItem(at: indexPath, animated: true)
                 }
             }
-            
+
             if oldValue != selectedSegmentIndex {
+                collectionView?.layoutIfNeeded()
+                if let item = self.collectionView?.cellForItem(at: IndexPath(item: oldValue, section: 0)) as? ImageOnTopSegmentCollectionViewCell {
+                    item.isHighlighted = false
+                }
                 self.sendActions(for: .valueChanged)
             }
         }
     }
-    
+
     /**
      Configure if the selected segment should have underline. Default value is false.
      */
@@ -399,26 +410,30 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
         } else {
             segmentData = segmentsData[index]
         }
-        
+
         return segmentData
     }
-    
+
     fileprivate func reloadSegments() {
         if let collectionView_ = collectionView {
             collectionView_.reloadData()
             if selectedSegmentIndex >= 0 {
                 let indexPath = IndexPath(item: selectedSegmentIndex, section: 0)
                 collectionView_.selectItem(at: indexPath, animated: true, scrollPosition: .left)
+                collectionView_.layoutIfNeeded()
+                if let item = self.collectionView?.cellForItem(at: indexPath) as? ImageOnTopSegmentCollectionViewCell {
+                    item.isHighlighted = true
+                }
             }
         }
     }
-    
+
     /*
      Private internal classes to be used only by this class.
      */
-    
+
     // MARK: - SegmentData
-    
+
     final private class SegmentData {
         var title:String?
         var normalAttributedTitle:NSAttributedString?
