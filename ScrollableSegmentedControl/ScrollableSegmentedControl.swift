@@ -581,7 +581,7 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
         
         override var isHighlighted: Bool {
             didSet {
-                underlineView?.isHidden = !isHighlighted
+                underlineView?.isHidden = !isHighlighted && !isSelected
             }
         }
         
