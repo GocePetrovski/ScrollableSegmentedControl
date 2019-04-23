@@ -74,7 +74,7 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
                     
                     if indexPath != nil {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.05, execute: {
-                            self.collectionView?.selectItem(at: indexPath, animated: true, scrollPosition: UICollectionView.ScrollPosition.left)
+                            self.collectionView?.selectItem(at: indexPath, animated: true, scrollPosition: .left)
                         })
                     }
                 }
@@ -265,8 +265,18 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
             }
             
             if selectedSegmentIndex >= 0 {
+                var scrollPossition:UICollectionView.ScrollPosition = .bottom
                 let indexPath = IndexPath(item: selectedSegmentIndex, section: 0)
-                collectionView?.selectItem(at: indexPath, animated: true, scrollPosition: .left)
+                if let atribs = collectionView?.layoutAttributesForItem(at: indexPath) {
+                    let frame = atribs.frame
+                    if frame.origin.x < collectionView!.contentOffset.x {
+                        scrollPossition = .left
+                    } else if frame.origin.x + frame.size.width > (collectionView!.frame.size.width + collectionView!.contentOffset.x) {
+                        scrollPossition = .right
+                    }
+                }
+            
+                collectionView?.selectItem(at: indexPath, animated: true, scrollPosition: scrollPossition)
             } else {
                 if let indexPath = collectionView?.indexPathsForSelectedItems?.first {
                     collectionView?.deselectItem(at: indexPath, animated: true)
@@ -387,7 +397,7 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
             collectionView_.reloadData()
             if selectedSegmentIndex >= 0 {
                 let indexPath = IndexPath(item: selectedSegmentIndex, section: 0)
-                collectionView_.selectItem(at: indexPath, animated: true, scrollPosition: .left)
+                collectionView_.selectItem(at: indexPath, animated: true, scrollPosition: .bottom)
             }
         }
     }
