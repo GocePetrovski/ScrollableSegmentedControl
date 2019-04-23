@@ -54,7 +54,8 @@ class TableViewController: UITableViewController {
     }
     
     @IBAction func removeSegment(_ sender: Any) {
-        if segmentedControl.numberOfSegments > 6 {
+        //segmentedControl.removeSegment(at: 0)
+        if segmentedControl.numberOfSegments > 1 {
             segmentedControl.removeSegment(at: segmentedControl.numberOfSegments - 1)
         }
     }
