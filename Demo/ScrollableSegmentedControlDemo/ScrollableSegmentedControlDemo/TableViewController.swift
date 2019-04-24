@@ -35,6 +35,7 @@ class TableViewController: UITableViewController {
         segmentedControl.insertSegment(withTitle: "Seg 4", image: #imageLiteral(resourceName: "segment-4"), at: 3)
         segmentedControl.insertSegment(withTitle: "Segment 5", image: #imageLiteral(resourceName: "segment-5"), at: 4)
         segmentedControl.insertSegment(withTitle: "Segment 6", image: #imageLiteral(resourceName: "segment-6"), at: 5)
+        segmentedControl.underlineHeight = 3.0
         
         segmentedControl.underlineSelected = true
         segmentedControl.selectedSegmentIndex = 0
@@ -60,6 +61,9 @@ class TableViewController: UITableViewController {
         }
     }
     
+    @IBAction func underlineHeightChanged(_ sender: UISlider) {
+        segmentedControl.underlineHeight = CGFloat(sender.value)
+    }
     @IBAction func toggleFixedWidth(_ sender: UISwitch) {
         segmentedControl.fixedSegmentWidth = sender.isOn
         segmentedControl.setNeedsLayout()
