@@ -97,6 +97,15 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
             reloadSegments()
         }
     }
+
+    fileprivate var _underlineHeight: CGFloat = 4.0
+    @objc public dynamic var underlineHeight: CGFloat {
+        get { return _underlineHeight }
+        set {
+            _underlineHeight = newValue
+            reloadSegments()
+        }
+    }
     
     fileprivate var _selectedSegmentContentColor:UIColor?
     @objc public dynamic var selectedSegmentContentColor:UIColor? {
@@ -470,7 +479,7 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
                 
                 segmentCell = cell
             }
-            
+            segmentCell.underlineHeight = segmentedControl.underlineHeight
             segmentCell.showUnderline = segmentedControl.underlineSelected
             if segmentedControl.underlineSelected {
                 segmentCell.tintColor = segmentedControl.tintColor
@@ -532,6 +541,11 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
         static let defaultTextColor = UIColor.darkGray
         
         var underlineView:UIView?
+        var underlineHeight: CGFloat = 4.0 {
+            didSet {
+                setNeedsUpdateConstraints()
+            }
+        }
         public var contentColor:UIColor?
         public var selectedContentColor:UIColor?
         
