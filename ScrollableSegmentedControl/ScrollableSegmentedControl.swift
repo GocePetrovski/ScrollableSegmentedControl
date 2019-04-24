@@ -640,7 +640,11 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
         
         override var isHighlighted: Bool {
             didSet {
-                if let title = (isHighlighted) ? super.highlightedAttributedTitle : super.normalAttributedTitle {
+                if isHighlighted, let title = super.highlightedAttributedTitle {
+                    titleLabel.attributedText = title
+                } else if isSelected, let title = super.selectedAttributedTitle {
+                    titleLabel.attributedText = title
+                } else if let title = super.normalAttributedTitle {
                     titleLabel.attributedText = title
                 } else {
                     titleLabel.isHighlighted = isHighlighted
