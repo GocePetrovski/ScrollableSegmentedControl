@@ -121,6 +121,32 @@ class ScrollableSegmentedControlTests: XCTestCase {
         underlineView = cell?.contentView.viewWithTag(999)
         XCTAssertTrue(underlineView?.backgroundColor == color)
     }
+
+    func testUnderlineHeight() {
+        segmentedControl.insertSegment(withTitle: "segment 1", image: nil, at: 0)
+        segmentedControl.underlineSelected = true
+        segmentedControl.segmentStyle = .textOnly
+
+        self.segmentedControl.underlineHeight = 3
+        segmentedControl.selectedSegmentIndex = 0
+
+        var collectionView = self.segmentedControl.viewWithTag(1) as? UICollectionView
+        var indexPath = collectionView!.indexPathsForSelectedItems?.last
+        var cell = collectionView?.dataSource?.collectionView(collectionView!, cellForItemAt: indexPath!)
+        var underlineView = cell?.contentView.viewWithTag(999)
+        // The underline has only one constraint at its level, the height
+        XCTAssertTrue(underlineView?.constraints.first?.constant == 3)
+
+        self.segmentedControl.underlineHeight = 10
+
+        collectionView = self.segmentedControl.viewWithTag(1) as? UICollectionView
+        indexPath = collectionView!.indexPathsForSelectedItems?.last
+        cell = collectionView?.dataSource?.collectionView(collectionView!, cellForItemAt: indexPath!)
+        underlineView = cell?.contentView.viewWithTag(999)
+        // The underline has only one constraint at its level, the height
+        XCTAssertTrue(underlineView?.constraints.first?.constant == 10)
+
+    }
     
 //    func testPerformanceExample() {
 //        // This is an example of a performance test case.
