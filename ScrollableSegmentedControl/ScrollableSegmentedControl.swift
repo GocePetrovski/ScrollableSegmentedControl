@@ -703,7 +703,7 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
         
         override var isHighlighted: Bool {
             didSet {
-                if isHighlighted {
+                if isHighlighted || isSelected {
                     imageView.tintColor = (selectedContentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : selectedContentColor!
                 } else {
                     imageView.tintColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
