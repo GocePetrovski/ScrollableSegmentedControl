@@ -179,7 +179,7 @@
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="3" minValue="1" maxValue="15" translatesAutoresizingMaskIntoConstraints="NO" id="Xg6-uj-iKM">
+                                                <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="4" minValue="1" maxValue="30" translatesAutoresizingMaskIntoConstraints="NO" id="Xg6-uj-iKM">
                                                     <rect key="frame" x="215" y="8" width="154" height="31"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="150" id="L20-6U-5ph"/>
