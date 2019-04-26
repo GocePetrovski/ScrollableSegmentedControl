@@ -739,6 +739,10 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
             variableConstraints.append(imageView.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.leadingAnchor, constant: BaseSegmentCollectionViewCell.textPadding))
             variableConstraints.append(contentView.trailingAnchor.constraint(greaterThanOrEqualTo: imageView.trailingAnchor, constant: BaseSegmentCollectionViewCell.textPadding))
             
+            if let underline = underlineView {
+                variableConstraints.append(underline.heightAnchor.constraint(equalToConstant: underlineHeight))
+            }
+            
             NSLayoutConstraint.activate(variableConstraints)
         }
     }
@@ -824,6 +828,10 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
             variableConstraints.append(stackView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor))
             variableConstraints.append(stackView.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.leadingAnchor, constant: BaseSegmentCollectionViewCell.textPadding))
             variableConstraints.append(contentView.trailingAnchor.constraint(greaterThanOrEqualTo: stackView.trailingAnchor, constant: BaseSegmentCollectionViewCell.textPadding))
+            
+            if let underline = underlineView {
+                variableConstraints.append(underline.heightAnchor.constraint(equalToConstant: underlineHeight))
+            }
             
             NSLayoutConstraint.activate(variableConstraints)
         }
