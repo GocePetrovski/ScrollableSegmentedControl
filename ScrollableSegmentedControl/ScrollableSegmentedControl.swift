@@ -102,8 +102,10 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
     @objc public dynamic var underlineHeight: CGFloat {
         get { return _underlineHeight }
         set {
-            _underlineHeight = newValue
-            reloadSegments()
+            if newValue != _underlineHeight {
+                _underlineHeight = newValue
+                reloadSegments()
+            }
         }
     }
     
@@ -543,7 +545,9 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
         var underlineView:UIView?
         var underlineHeight: CGFloat = 4.0 {
             didSet {
-                setNeedsUpdateConstraints()
+                if oldValue != underlineHeight {
+                    setNeedsUpdateConstraints()
+                }
             }
         }
         public var contentColor:UIColor?
@@ -595,9 +599,6 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
         private func configureConstraints() {
             if let underline = underlineView {
                 underline.translatesAutoresizingMaskIntoConstraints = false
-                let heightConstrain = underline.heightAnchor.constraint(equalToConstant: underlineHeight)
-                variableConstraints.append(heightConstrain)
-                heightConstrain.isActive = true
                 underline.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
                 underline.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
                 underline.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
