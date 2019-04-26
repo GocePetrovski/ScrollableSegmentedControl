@@ -641,7 +641,11 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
         
         override var isHighlighted: Bool {
             didSet {
-                if let title = (isHighlighted) ? super.highlightedAttributedTitle : super.normalAttributedTitle {
+                if isHighlighted, let title = super.highlightedAttributedTitle {
+                    titleLabel.attributedText = title
+                } else if isSelected, let title = super.selectedAttributedTitle {
+                    titleLabel.attributedText = title
+                } else if let title = super.normalAttributedTitle {
                     titleLabel.attributedText = title
                 } else {
                     titleLabel.isHighlighted = isHighlighted
@@ -704,7 +708,7 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
         
         override var isHighlighted: Bool {
             didSet {
-                if isHighlighted {
+                if isHighlighted || isSelected {
                     imageView.tintColor = (selectedContentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : selectedContentColor!
                 } else {
                     imageView.tintColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
@@ -768,13 +772,17 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
 
         override var isHighlighted: Bool {
             didSet {
-                if let title = (isHighlighted) ? super.highlightedAttributedTitle : super.normalAttributedTitle {
+                if isHighlighted, let title = super.highlightedAttributedTitle {
+                    titleLabel.attributedText = title
+                } else if isSelected, let title = super.selectedAttributedTitle {
+                    titleLabel.attributedText = title
+                } else if let title = super.normalAttributedTitle {
                     titleLabel.attributedText = title
                 } else {
                     titleLabel.isHighlighted = isHighlighted
                 }
                 
-                if isHighlighted {
+                if isHighlighted || isSelected {
                     imageView.tintColor = (selectedContentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : selectedContentColor!
                 } else {
                     imageView.tintColor = (contentColor == nil) ? BaseSegmentCollectionViewCell.defaultTextColor : contentColor!
