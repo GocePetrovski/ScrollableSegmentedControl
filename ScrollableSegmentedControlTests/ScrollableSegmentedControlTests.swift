@@ -133,6 +133,7 @@ class ScrollableSegmentedControlTests: XCTestCase {
         var collectionView = self.segmentedControl.viewWithTag(1) as? UICollectionView
         var indexPath = collectionView!.indexPathsForSelectedItems?.last
         var cell = collectionView?.dataSource?.collectionView(collectionView!, cellForItemAt: indexPath!)
+        cell?.updateConstraints()
         var underlineView = cell?.contentView.viewWithTag(999)
         // The underline has only one constraint at its level, the height
         XCTAssertTrue(underlineView?.constraints.first?.constant == 3)
@@ -142,6 +143,7 @@ class ScrollableSegmentedControlTests: XCTestCase {
         collectionView = self.segmentedControl.viewWithTag(1) as? UICollectionView
         indexPath = collectionView!.indexPathsForSelectedItems?.last
         cell = collectionView?.dataSource?.collectionView(collectionView!, cellForItemAt: indexPath!)
+        cell?.updateConstraints()
         underlineView = cell?.contentView.viewWithTag(999)
         // The underline has only one constraint at its level, the height
         XCTAssertTrue(underlineView?.constraints.first?.constant == 10)
