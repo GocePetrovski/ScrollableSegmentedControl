@@ -97,6 +97,15 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
             reloadSegments()
         }
     }
+
+    fileprivate var _underlineHeight: CGFloat = 4.0
+    @objc public dynamic var underlineHeight: CGFloat {
+        get { return _underlineHeight }
+        set {
+            _underlineHeight = newValue
+            reloadSegments()
+        }
+    }
     
     fileprivate var _selectedSegmentContentColor:UIColor?
     @objc public dynamic var selectedSegmentContentColor:UIColor? {
@@ -470,7 +479,7 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
                 
                 segmentCell = cell
             }
-            
+            segmentCell.underlineHeight = segmentedControl.underlineHeight
             segmentCell.showUnderline = segmentedControl.underlineSelected
             if segmentedControl.underlineSelected {
                 segmentCell.tintColor = segmentedControl.tintColor
@@ -532,6 +541,11 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
         static let defaultTextColor = UIColor.darkGray
         
         var underlineView:UIView?
+        var underlineHeight: CGFloat = 4.0 {
+            didSet {
+                setNeedsUpdateConstraints()
+            }
+        }
         public var contentColor:UIColor?
         public var selectedContentColor:UIColor?
         
@@ -581,7 +595,9 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
         private func configureConstraints() {
             if let underline = underlineView {
                 underline.translatesAutoresizingMaskIntoConstraints = false
-                underline.heightAnchor.constraint(equalToConstant: 4.0).isActive = true
+                let heightConstrain = underline.heightAnchor.constraint(equalToConstant: underlineHeight)
+                variableConstraints.append(heightConstrain)
+                heightConstrain.isActive = true
                 underline.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
                 underline.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
                 underline.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
@@ -668,7 +684,10 @@ public enum ScrollableSegmentedControlSegmentStyle: Int {
             variableConstraints.append(titleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor))
             variableConstraints.append(titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: BaseSegmentCollectionViewCell.textPadding))
             variableConstraints.append(titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -BaseSegmentCollectionViewCell.textPadding))
-            
+
+            if let underline = underlineView {
+                variableConstraints.append(underline.heightAnchor.constraint(equalToConstant: underlineHeight))
+            }
             NSLayoutConstraint.activate(variableConstraints)
         }
     }
